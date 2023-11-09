@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+     "strict": false,                                      /* Enable all strict type-checking options. */
+     "strictNullChecks": false,                         /* When type checking, take into account 'null' and 'undefined'. */
+  }
+}
