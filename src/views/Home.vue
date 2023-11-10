@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useStore} from 'vuex'
 import {reactive, ref} from 'vue'
-import {Offer, Type as OfferType, State as OfferState} from '../entity/Offer'
+import {Offer} from '../entity/Offer'
 import * as api from '../api'
 import {ElMessage} from 'element-plus'
 import {AxiosError} from 'axios'
@@ -29,7 +29,6 @@ const stateLabels = [
     '已取消',
     '到期未达成',
 ]
-console.log(OfferState)
 
 async function loadPage(pageNo = 1) {
     const start = (pageNo - 1) * pageSize
@@ -47,6 +46,10 @@ async function loadPage(pageNo = 1) {
     offers.splice(0, offers.length, ...data.list)
     total.value = data.total
 }
+
+const publishDialogVisible = ref(false)
+
+const offerToPublish = reactive(new Offer())
 </script>
 
 <template>
@@ -56,14 +59,80 @@ async function loadPage(pageNo = 1) {
             <span class="vip-icon">VIP</span>
         </div>
     </nav>
-    <el-menu
-        mode="horizontal"
-        class="tabs"
-        default-active="offer"
-    >
-        <el-menu-item index="offer">寻去处</el-menu-item>
-        <el-menu-item index="answer">欢迎来</el-menu-item>
-    </el-menu>
+    <div class="local-nav">
+        <el-menu
+            mode="horizontal"
+            class="tabs"
+            default-active="offer"
+        >
+            <el-menu-item index="offer">寻去处</el-menu-item>
+            <el-menu-item index="answer">欢迎来</el-menu-item>
+        </el-menu>
+        <ul class="toolbar">
+            <li>
+                <el-button
+                    type="primary"
+                    class="publish-btn"
+                    @click="publishDialogVisible = true"
+                >
+                    发布请求
+                </el-button>
+            </li>
+        </ul>
+    </div>
+    <el-dialog v-model="publishDialogVisible" title="发布新请求">
+        <el-form
+            :model="offerToPublish"
+            class="publish-form"
+            label-width="80px"
+        >
+            <el-form-item label="主题名称">
+                <el-input
+                    v-model="offerToPublish.title"
+                    autocomplete="off"
+                />
+            </el-form-item>
+            <el-form-item label="描述">
+                <el-input
+                    v-model="offerToPublish.desc"
+                    type="textarea"
+                    autocomplete="off"
+                />
+            </el-form-item>
+            <el-form-item label="去处类型">
+                <el-select
+                    v-model="offerToPublish.type"
+                >
+                    <el-option
+                        v-for="(label, i) in typeLabels"
+                        :key="label"
+                        :label="label"
+                        :value="i"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="价格">
+                <el-input-number v-model="offerToPublish.price" class="price-ipt"/>
+                <span class="unit">元</span>
+            </el-form-item>
+            <el-form-item label="过期时间">
+                <el-date-picker
+                    v-model="offerToPublish.expire"
+                    type="datetime"
+                    placeholder="选择日期及时间"
+                    format="YYYY/MM/DD HH:mm:ss"
+                />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="publishDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="publishDialogVisible = false">
+              提交
+            </el-button>
+          </span>
+        </template>
+    </el-dialog>
     <ul class="list">
         <li
             class="offer-preview"
@@ -107,8 +176,15 @@ async function loadPage(pageNo = 1) {
     color: #333;
 }
 
-.tabs {
+.local-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 20px;
+}
+
+.publish-btn {
+    height: calc(var(--el-menu-horizontal-height) - 1em);
 }
 
 .tabs :deep(a) {
@@ -152,5 +228,17 @@ async function loadPage(pageNo = 1) {
 
 .pagination {
     justify-content: center;
+}
+
+.publish-form {
+    padding: 0 20px;
+}
+
+.price-ipt {
+    width: calc(100% - 2.2em);
+}
+
+.unit {
+    margin-left: 1em;
 }
 </style>
