@@ -1,6 +1,6 @@
 import axios from 'axios'
-import {User, IDCardType} from '../entity/User'
-import {MaxLength, validate, validateOrReject} from 'class-validator'
+import {User} from '../entity/User'
+import {validateOrReject} from 'class-validator'
 
 const instance = axios.create({
   baseURL: 'http://localhost:3000',
@@ -29,8 +29,10 @@ export async function signin(name: string, pwd: string) {
   return obj
 }
 
-export async function signup(user: User) {
-  await validateOrReject(user)
+export async function signup(user: User, validate = true) {
+  if (validate) {
+    await validateOrReject(user)
+  }
 
   const obj: User | string = await instance.post('/signup', user)
   if (typeof obj !== 'object') {

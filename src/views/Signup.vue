@@ -4,6 +4,8 @@ import * as api from '../api'
 import {IDCardType, User} from '../entity/User'
 import {useStore} from 'vuex'
 import {ElMessage} from 'element-plus'
+import {validate} from 'class-validator'
+import {AxiosError} from 'axios'
 
 const store = useStore<{
     user?: User
@@ -12,22 +14,60 @@ const store = useStore<{
 
 const user = reactive(new User())
 
-let userProvinceIdx = ref(-1)
-let userCityIdx = ref(-1)
-let loadingProvinces = ref(true)
-let loadingCities = ref(false)
+const userProvinceIdx = ref(-1)
+const userCityIdx = ref(-1)
+const repetitionPwd = ref('')
+const loadingProvinces = ref(true)
+const loadingCities = ref(false)
 
 store.dispatch('getProvinces')
     .then(() => loadingProvinces.value = false)
 
 async function signup() {
-    let userOrMsg: User | string
-    try {
-        userOrMsg = await api.signup(user)
-    } catch (e: any) {
+    // todo: 给user城市赋值
+    const validationErrors = await validate(user)
+    if (validationErrors.length) {
+        for (const {constraints} of validationErrors) {
+            if (constraints) {
+                for (const message of Object.values(constraints)) {
+                    ElMessage.error({
+                        showClose: true,
+                        message,
+                    })
+                }
+            }
+        }
+        return console.error(validationErrors)
+    }
+    if (userProvinceIdx.value < 0) {
         ElMessage.error({
             showClose: true,
-            message: e,
+            message: '请选择省份',
+        })
+        return
+    }
+    if (userCityIdx.value < 0) {
+        ElMessage.error({
+            showClose: true,
+            message: '请选择城市',
+        })
+        return
+    }
+    if (repetitionPwd.value !== user.pwd) {
+        ElMessage.error({
+            showClose: true,
+            message: '密码不一致',
+        })
+        return
+    }
+
+    let userOrMsg: User | string
+    try {
+        userOrMsg = await api.signup(user, false)
+    } catch (e) {
+        ElMessage.error({
+            showClose: true,
+            message: (e as AxiosError).message,
         })
         return console.error(e)
     }
@@ -49,8 +89,11 @@ async function onProvinceChange() {
     loadingCities.value = true
     try {
         await store.dispatch('getCities', store.state.provinces[userProvinceIdx.value].id)
-    } catch (e: any) {
-        ElMessage.error(e)
+    } catch (e) {
+        ElMessage.error({
+            showClose: true,
+            message: (e as AxiosError).message,
+        })
         console.error(e)
     } finally {
         loadingCities.value = false
@@ -73,7 +116,7 @@ async function onProvinceChange() {
         </el-form-item>
         <el-form-item label="重复密码">
             <el-input
-                v-model="user.pwd"
+                v-model="repetitionPwd"
                 type="password"
                 show-password
             />
