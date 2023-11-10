@@ -161,8 +161,11 @@ async function onSubmit() {
             v-for="offer in offers"
             :key="offer.id"
         >
-            <el-card class="card">
-                <h3 class="card-title">{{ offer.title }}</h3>
+            <el-card
+                class="card"
+                :header="offer.title"
+                shadow="hover"
+            >
                 <p class="desc">{{ offer.desc }}</p>
                 <div class="card-footer">
                     <span class="offer-type">类型：{{ typeLabels[offer.type] }}</span>
@@ -230,9 +233,12 @@ async function onSubmit() {
 
 .offer-preview {
     min-width: 280px;
+    cursor: pointer;
 }
 
-.card-title {
+:deep(.el-card__header) {
+    font-weight: 700;
+
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -246,14 +252,13 @@ async function onSubmit() {
     word-break: break-all;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-
-    margin: 20px 0 10px 0;
-    border-bottom: 1px solid #666;
 }
 
 .card-footer {
     display: flex;
     justify-content: space-between;
+    margin-top: 1em;
+    border-top: 1px solid #eee;
 }
 
 .pagination {
