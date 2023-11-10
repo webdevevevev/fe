@@ -1,13 +1,14 @@
 import axios from 'axios'
 import {User} from '../entity/User'
 import {validateOrReject} from 'class-validator'
+import {Offer} from '../entity/Offer'
 
 const instance = axios.create({
   baseURL: 'http://localhost:3000',
 })
 
 instance.interceptors.request.use(config => {
-  config.headers.setAuthorization('Bearer' + localStorage.getItem('sign'))
+  config.headers.setAuthorization('Bearer ' + localStorage.getItem('sign'))
   return config
 })
 
@@ -52,6 +53,21 @@ export function getProvinces() {
 
 export function getCities(provinceId: number) {
   return instance.get<any, { id: number, name: string }[]>(`/province/${provinceId}`)
+}
+
+export async function findOffers(start: number, end: number) {
+  const data: { list: Offer[], total: number } = await instance.get('/offer', {
+    params: {
+      type: '',
+      title: '',
+      start,
+      end,
+    },
+  })
+  for (const offer of data.list) {
+    Object.setPrototypeOf(offer, Offer.prototype)
+  }
+  return data
 }
 
 export default instance
