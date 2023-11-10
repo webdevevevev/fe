@@ -50,6 +50,20 @@ async function loadPage(pageNo = 1) {
 const publishDialogVisible = ref(false)
 
 const offerToPublish = reactive(new Offer())
+
+async function onSubmit() {
+    publishDialogVisible.value = false
+    const idOrMsg = await api.publishOffer(offerToPublish)
+    if (typeof idOrMsg === 'number') {
+        console.log(idOrMsg)
+    } else {
+        ElMessage.error({
+            showClose: true,
+            message: idOrMsg,
+        })
+        console.error(idOrMsg)
+    }
+}
 </script>
 
 <template>
@@ -127,7 +141,7 @@ const offerToPublish = reactive(new Offer())
         <template #footer>
           <span class="dialog-footer">
             <el-button @click="publishDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="publishDialogVisible = false">
+            <el-button type="primary" @click="onSubmit">
               提交
             </el-button>
           </span>
