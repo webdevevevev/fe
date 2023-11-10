@@ -6,6 +6,11 @@ const instance = axios.create({
   baseURL: 'http://localhost:3000',
 })
 
+instance.interceptors.request.use(config => {
+  config.headers.setAuthorization('Bearer' + localStorage.getItem('sign'))
+  return config
+})
+
 instance.interceptors.response.use(({data}) => data)
 
 export function allUsers() {
@@ -21,11 +26,10 @@ export async function signin(name: string, pwd: string) {
     throw `password ${pwd} can't be longer than ${maxLength} characters`
   }
 
-  const obj: User | string = await instance.post('/signin', {name, pwd})
+  const obj: { sign: string, nickname: string } | string = await instance.post('/signin', {name, pwd})
   if (typeof obj !== 'object') {
     return obj
   }
-  Object.setPrototypeOf(obj, User.prototype)
   return obj
 }
 

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {reactive} from 'vue'
 import * as api from '../api'
-import {User} from '../entity/User'
 import {useStore} from 'vuex'
+import {useRouter} from 'vue-router'
 import {ElMessage} from 'element-plus'
 
 const store = useStore()
+const router = useRouter()
 
 const form = reactive({
     name: '',
@@ -13,9 +14,9 @@ const form = reactive({
 })
 
 async function onSubmit() {
-    let userOrMsg: User | string
+    let signOrMsg: { sign: string, nickname: string } | string
     try {
-        userOrMsg = await api.signin(form.name, form.pwd)
+        signOrMsg = await api.signin(form.name, form.pwd)
     } catch (e: any) {
         ElMessage.error({
             showClose: true,
@@ -23,12 +24,15 @@ async function onSubmit() {
         })
         return console.error(e)
     }
-    if (userOrMsg instanceof User) {
-        store.commit('signin', userOrMsg)
+    if (typeof signOrMsg === 'object') {
+        const {sign} = signOrMsg
+        store.commit('signin', form.name)
+        localStorage.setItem('sign', sign)
+        router.push('/home')
     } else {
         ElMessage.error({
             showClose: true,
-            message: userOrMsg,
+            message: signOrMsg,
         })
     }
 }

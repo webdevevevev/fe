@@ -1,9 +1,23 @@
 <script setup lang="ts">
+import {useStore} from 'vuex'
+
+const store = useStore()
+
+/*function getSignPayload(): Readonly<{
+    id: number
+    admin: boolean
+    iat: number
+    exp: number
+}> {
+    const sign = localStorage.getItem('sign')!
+    const signPayloadA = sign.split('.', 2)[1]
+    const json = atob(signPayloadA)
+    return JSON.parse(json)
+}*/
 </script>
 
 <template>
-    <router-link to="/signin">登录</router-link>
-    <router-link to="/signup">注册</router-link>
+    home {{ store.state.nickname }}
 </template>
 
 <style scoped>

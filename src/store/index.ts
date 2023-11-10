@@ -3,18 +3,18 @@ import {User} from '../entity/User'
 import * as api from '../api'
 
 export default createStore<{
-  user?: User
+  nickname?: string
   provinces: { id: number, name: string, cities: { id: number, name: string }[] }[]
 }>({
   state() {
     return {
-      user: undefined,
+      nickname: undefined,
       provinces: [],
     }
   },
   mutations: {
-    signin(state, user: User) {
-      state.user = user
+    signin(state, nickname: string) {
+      state.nickname = nickname
     },
     getProvinces(state, provinces: { id: number, name: string, cities: { id: number, name: string }[] }[]) {
       state.provinces = provinces
