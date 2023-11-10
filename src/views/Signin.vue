@@ -28,7 +28,7 @@ async function onSubmit() {
         const {sign} = signOrMsg
         store.commit('signin', form.name)
         localStorage.setItem('sign', sign)
-        router.push('/home')
+        router.push('home')
     } else {
         ElMessage.error({
             showClose: true,
@@ -55,7 +55,7 @@ async function onSubmit() {
             <el-button type="primary" @click="onSubmit">登录</el-button>
         </el-form-item>
         <el-form-item>
-            <router-link to="/signup" class="link">没有账号？点此注册</router-link>
+            <router-link to="signup" class="link">没有账号？点此注册</router-link>
         </el-form-item>
     </el-form>
 </template>
