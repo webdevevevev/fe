@@ -28,7 +28,7 @@ async function onSubmit() {
         const {sign} = signOrMsg
         store.commit('signin', form.name)
         localStorage.setItem('sign', sign)
-        router.push('home')
+        router.push('/')
     } else {
         ElMessage.error({
             showClose: true,
