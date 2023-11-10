@@ -164,7 +164,7 @@ async function onSubmit() {
             <el-card
                 class="card"
                 :header="offer.title"
-                shadow="hover"
+                shadow="always"
             >
                 <p class="desc">{{ offer.desc }}</p>
                 <div class="card-footer">
@@ -234,6 +234,11 @@ async function onSubmit() {
 .offer-preview {
     min-width: 280px;
     cursor: pointer;
+
+    &:hover {
+        transform: scale(1.02);
+        transition: transform .2s;
+    }
 }
 
 :deep(.el-card__header) {
@@ -242,6 +247,9 @@ async function onSubmit() {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    background-color: var(--el-color-primary-dark-2);
+    color: #fff;
 }
 
 .desc {
