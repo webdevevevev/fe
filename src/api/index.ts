@@ -70,8 +70,9 @@ export async function findOffers(start: number, end: number) {
   return data
 }
 
-export function publishOffer(offer: Offer) {
-  return instance.post<any, number | string>('/offer', offer)
+export async function publishOffer(offer: Offer) {
+  const obj: { insertId: number } = await instance.post('/offer', offer)
+  return obj.insertId
 }
 
 export default instance

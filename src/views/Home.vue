@@ -49,19 +49,27 @@ async function loadPage(pageNo = 1) {
 
 const publishDialogVisible = ref(false)
 
-const offerToPublish = reactive(new Offer())
+let offerToPublish = reactive(new Offer())
 
 async function onSubmit() {
     publishDialogVisible.value = false
-    const idOrMsg = await api.publishOffer(offerToPublish)
-    if (typeof idOrMsg === 'number') {
-        console.log(idOrMsg)
-    } else {
+    let id: number
+    try {
+        id = await api.publishOffer(offerToPublish)
+    } catch (e) {
         ElMessage.error({
             showClose: true,
-            message: idOrMsg,
+            message: (e as AxiosError).message,
         })
-        console.error(idOrMsg)
+        return console.error(e)
+    }
+    const offer = offerToPublish
+    offerToPublish = new Offer()
+    ;(offer as any).id = id
+    total.value++
+    if (offers.length < pageSize) {
+        offers.push(offer)
+        return
     }
 }
 </script>
