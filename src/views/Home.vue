@@ -8,7 +8,7 @@ import {AxiosError} from 'axios'
 
 const store = useStore()
 
-const pageSize = 20
+const pageSize = 9
 
 const offers = reactive<Offer[]>([])
 const total = ref(0)
@@ -201,6 +201,10 @@ async function onSubmit() {
     height: calc(var(--el-menu-horizontal-height) - 1em);
 }
 
+.tabs {
+    flex: 1;
+}
+
 .tabs :deep(a) {
     color: unset;
 
@@ -210,7 +214,14 @@ async function onSubmit() {
 }
 
 .list {
-    margin: 20px 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1em;
+    margin: 20px auto 10px;
+}
+
+.offer-preview {
+    min-width: 280px;
 }
 
 .card-title {
@@ -220,9 +231,11 @@ async function onSubmit() {
 }
 
 .desc {
+    height: 3em;
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
+    word-break: break-all;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 
@@ -233,11 +246,6 @@ async function onSubmit() {
 .card-footer {
     display: flex;
     justify-content: space-between;
-}
-
-.list {
-    display: grid;
-    grid-template: 5fr/4fr;
 }
 
 .pagination {
