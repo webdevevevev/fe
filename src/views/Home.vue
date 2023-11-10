@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useStore} from 'vuex'
 import {reactive, ref} from 'vue'
-import {Offer} from '../entity/Offer'
+import {Offer, State as OfferState} from '../entity/Offer'
 import * as api from '../api'
 import {ElMessage} from 'element-plus'
 import {AxiosError} from 'axios'
@@ -168,8 +168,17 @@ async function onSubmit() {
             >
                 <p class="desc">{{ offer.desc }}</p>
                 <div class="card-footer">
-                    <span class="offer-type">类型：{{ typeLabels[offer.type] }}</span>
-                    <span class="offer-state">状态：{{ stateLabels[offer.state] }}</span>
+                    <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
+                        {{ typeLabels[offer.type] }}
+                    </el-tooltip>
+                    <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
+                        <span
+                            class="offer-state"
+                            :class="OfferState[offer.state]"
+                        >
+                            {{ stateLabels[offer.state] }}
+                        </span>
+                    </el-tooltip>
                 </div>
             </el-card>
         </li>
@@ -265,8 +274,10 @@ async function onSubmit() {
 .card-footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 1em;
-    border-top: 1px solid #eee;
+    align-items: center;
+    margin-top: .6em;
+    padding-top: .4em;
+    border-top: 1px solid #ccc;
 }
 
 .pagination {
@@ -283,5 +294,27 @@ async function onSubmit() {
 
 .unit {
     margin-left: 1em;
+}
+
+.offer-state {
+    padding: .4em;
+    border-radius: var(--el-border-radius-base);
+    color: #fff;
+}
+
+.fulfilled {
+    background-color: var(--el-color-success);
+}
+
+.pending {
+    background-color: var(--el-color-primary);
+}
+
+.canceled {
+    background-color: var(--el-color-warning);
+}
+
+.expired {
+    background-color: var(--el-color-info);
 }
 </style>
