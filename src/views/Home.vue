@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {Delete, Edit, Search, Share, Upload} from '@element-plus/icons-vue'
 import {useStore} from 'vuex'
 import {reactive, ref} from 'vue'
 import {Offer, State as OfferState} from '../entity/Offer'
@@ -163,10 +164,16 @@ async function onSubmit() {
         >
             <el-card
                 class="card"
-                :header="offer.title"
                 shadow="always"
             >
-                <p class="desc">{{ offer.desc }}</p>
+                <template #header>
+                    <h3 class="card-title">{{ offer.title }}</h3>
+                    <el-button-group size="small" class="btn-group">
+                        <el-button :icon="Delete"/>
+                        <el-button :icon="Edit"/>
+                    </el-button-group>
+                </template>
+                <el-text :line-clamp="2" class="desc">{{ offer.desc }}</el-text>
                 <div class="card-footer">
                     <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
                         {{ typeLabels[offer.type] }}
@@ -251,24 +258,28 @@ async function onSubmit() {
 }
 
 :deep(.el-card__header) {
+    display: flex;
+    justify-content: space-between;
     font-weight: 700;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 
     background-color: var(--el-color-primary-dark-2);
     color: #fff;
 }
 
-.desc {
-    height: 3em;
-    display: -webkit-box;
+.card-title {
+    flex: 1;
+    margin-right: 1em;
     overflow: hidden;
     text-overflow: ellipsis;
-    word-break: break-all;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
+}
+
+.btn-group {
+    flex: none;
+}
+
+.desc {
+    height: 3em;
 }
 
 .card-footer {
