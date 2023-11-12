@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Delete, Edit, Avatar} from '@element-plus/icons-vue'
+import {Delete, Edit, Avatar, ArrowDown} from '@element-plus/icons-vue'
 import {useStore} from 'vuex'
 import {reactive, ref} from 'vue'
 import {Offer, State as OfferState} from '../entity/Offer'
@@ -78,12 +78,34 @@ async function onSubmit() {
 <template>
     <nav class="nav">
         <h1 class="title">好去处</h1>
-        <router-link to="profile" class="profile">
-            {{ store.state.nickname }}
-            <el-icon size="large" class="vip-icon">
-                <Avatar/>
-            </el-icon>
-        </router-link>
+        <el-dropdown class="dropdown" trigger="click">
+            <span class="dropdown-link">
+                {{ store.state.nickname }}
+                <el-icon size="large" class="avatar-icon">
+                    <Avatar/>
+                </el-icon>
+                <el-icon>
+                    <ArrowDown/>
+                </el-icon>
+            </span>
+            <template #dropdown>
+                <el-dropdown-menu class="dropdown-menu">
+                    <el-dropdown-item>
+                        <router-link to="profile">
+                            账号设置
+                        </router-link>
+                    </el-dropdown-item>
+                    <el-dropdown-item divided>
+                        <router-link
+                            to="welcome"
+                            @click="localStorage.removeItem('sign')"
+                        >
+                            退出
+                        </router-link>
+                    </el-dropdown-item>
+                </el-dropdown-menu>
+            </template>
+        </el-dropdown>
     </nav>
     <div class="local-nav">
         <el-menu
@@ -209,10 +231,15 @@ async function onSubmit() {
     justify-content: space-between;
 }
 
-.title {
+.dropdown {
+    cursor: pointer;
 }
 
-.vip-icon {
+.dropdown-menu a {
+    color: unset;
+}
+
+.avatar-icon {
     margin-left: 1em;
     padding: .5em;
     border-radius: .2em .5em;
@@ -225,10 +252,6 @@ async function onSubmit() {
     justify-content: space-between;
     align-items: center;
     margin-top: 20px;
-}
-
-.profile {
-    color: unset;
 }
 
 .publish-btn {
@@ -267,7 +290,10 @@ async function onSubmit() {
 :deep(.el-card__header) {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-weight: 700;
+    padding-top: 1em;
+    padding-bottom: 1em;
 
     background-color: var(--el-color-primary-dark-2);
     color: #fff;
