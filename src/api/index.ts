@@ -63,6 +63,10 @@ export function getCities(provinceId: number) {
   return instance.get<any, { id: number, name: string }[]>(`/province/${provinceId}`)
 }
 
+export function getCityName(provinceId: number, cityId: number) {
+  return instance.get<any, { city: string, province: string }>(`/province/${provinceId}/city/${cityId}`)
+}
+
 export async function findOffers(start: number, end: number) {
   const data: { list: Offer[], total: number } = await instance.get('/offer', {
     params: {

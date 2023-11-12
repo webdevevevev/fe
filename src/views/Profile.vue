@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {User} from '../entity/User'
+import type {User as UserEntity} from '../entity/User'
 import {reactive} from 'vue'
 import * as api from '../api'
 
@@ -7,13 +8,24 @@ const IDCardTypeLabels = [
     '中华人民共和国居民身份证',
 ]
 
-const user = reactive(new User())
+interface User extends UserEntity {
+    ctime: Date
+    city?: string
+    province?: string
+}
 
-api.profile().then(profile => {
+const user = reactive<User>(new User())
+
+async function loadData() {
+    const profile = await api.profile()
     Object.assign(user, profile)
     user.mtime = new Date(user.mtime)
     user.ctime = new Date(user.ctime)
-})
+    const cityName = await api.getCityName(user.provinceId, user.cityId)
+    Object.assign(user, cityName)
+}
+
+loadData()
 
 function fmtNum(n: number) {
     return n.toString().padStart(2, '0')
@@ -47,7 +59,7 @@ function fmtDate(date: Date) {
         <el-form-item label="用户简介">
             <el-input v-model="user.intro" type="textarea"/>
         </el-form-item>
-        <el-form-item label="注册城市">{{ user.cityId }}</el-form-item>
+        <el-form-item label="注册城市">{{ user.province }} {{ user.city }}</el-form-item>
         <el-form-item label="注册时间" v-if="user.ctime">{{ fmtDate(user.ctime) }}</el-form-item>
         <el-form-item label="修改时间" v-if="user.mtime">{{ fmtDate(user.mtime) }}</el-form-item>
         <el-form-item>
