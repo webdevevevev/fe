@@ -6,6 +6,9 @@ import {useStore} from 'vuex'
 import {ElMessage} from 'element-plus'
 import {validate} from 'class-validator'
 import {AxiosError} from 'axios'
+import {useRouter} from 'vue-router'
+
+const router = useRouter()
 
 const store = useStore<{
     user?: User
@@ -75,6 +78,11 @@ async function signup() {
     }
     if (userOrMsg instanceof User) {
         store.commit('signin', userOrMsg)
+        ElMessage.success({
+            showClose: true,
+            message: '注册成功',
+        })
+        router.push({name: 'signin'})
     } else {
         ElMessage.error({
             showClose: true,
