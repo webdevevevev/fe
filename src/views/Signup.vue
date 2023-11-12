@@ -24,7 +24,6 @@ store.dispatch('getProvinces')
     .then(() => loadingProvinces.value = false)
 
 async function signup() {
-    // todo: 给user城市赋值
     const validationErrors = await validate(user)
     if (validationErrors.length) {
         for (const {constraints} of validationErrors) {
@@ -60,6 +59,9 @@ async function signup() {
         })
         return
     }
+    const province = store.state.provinces[userProvinceIdx.value]
+    user.provinceId = province.id
+    user.cityId = province.cities[userCityIdx.value].id
 
     let userOrMsg: User | string
     try {
