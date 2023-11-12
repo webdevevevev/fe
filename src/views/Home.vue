@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Delete, Edit, Search, Share, Upload} from '@element-plus/icons-vue'
+import {Delete, Edit, Avatar} from '@element-plus/icons-vue'
 import {useStore} from 'vuex'
 import {reactive, ref} from 'vue'
 import {Offer, State as OfferState} from '../entity/Offer'
@@ -9,7 +9,7 @@ import {AxiosError} from 'axios'
 
 const store = useStore()
 
-const pageSize = 9
+const pageSize = 12
 
 const offers = reactive<Offer[]>([])
 const total = ref(0)
@@ -78,9 +78,12 @@ async function onSubmit() {
 <template>
     <nav class="nav">
         <h1 class="title">好去处</h1>
-        <div>{{ store.state.nickname }}
-            <span class="vip-icon">VIP</span>
-        </div>
+        <router-link to="profile" class="profile">
+            {{ store.state.nickname }}
+            <el-icon size="large" class="vip-icon">
+                <Avatar/>
+            </el-icon>
+        </router-link>
     </nav>
     <div class="local-nav">
         <el-menu
@@ -222,6 +225,10 @@ async function onSubmit() {
     justify-content: space-between;
     align-items: center;
     margin-top: 20px;
+}
+
+.profile {
+    color: unset;
 }
 
 .publish-btn {

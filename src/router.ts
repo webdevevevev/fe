@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
 import Home from './views/Home.vue'
+import {isSignedIn} from './utils'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -36,6 +37,11 @@ const routes: RouteRecordRaw[] = [
       component: () => import('./views/Answer.vue'),
     }],
   },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('./views/Profile.vue'),
+  },
 ]
 
 const router = createRouter({
@@ -50,7 +56,3 @@ router.beforeEach(to => {
 })
 
 export default router
-
-function isSignedIn() {
-  return Boolean(localStorage.getItem('sign'))
-}

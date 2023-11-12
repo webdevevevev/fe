@@ -18,6 +18,14 @@ export function allUsers() {
   return instance.get<any, User[]>('/user')
 }
 
+export function nickname() {
+  return instance.get<any, string>('/nickname')
+}
+
+export function profile() {
+  return instance.get<any, string>('/profile')
+}
+
 export async function signin(name: string, pwd: string) {
   const maxLength = 50
   if (name.length > maxLength) {

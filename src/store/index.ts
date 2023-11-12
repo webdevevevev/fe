@@ -1,5 +1,4 @@
 import {createStore} from 'vuex'
-import {User} from '../entity/User'
 import * as api from '../api'
 
 export default createStore<{
@@ -23,6 +22,9 @@ export default createStore<{
       const province = state.provinces.find(({id}) => id === provinceId)
       province!.cities = cities
     },
+    getNickname(state, nickname: string) {
+      state.nickname = nickname
+    },
   },
   actions: {
     async getProvinces({commit}) {
@@ -35,6 +37,9 @@ export default createStore<{
         provinceId,
         cities,
       })
+    },
+    async getNickname({commit}) {
+      commit('getNickname', await api.nickname())
     },
   },
 })
