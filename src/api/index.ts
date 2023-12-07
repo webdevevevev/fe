@@ -93,4 +93,8 @@ export async function publishOffer(offer: Offer) {
   return obj.insertId
 }
 
+export function deleteOffer(id: number) {
+  return instance.delete(`/offer/${id}`)
+}
+
 export default instance

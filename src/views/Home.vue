@@ -4,10 +4,11 @@ import {useStore} from 'vuex'
 import {onMounted, reactive, ref} from 'vue'
 import {Offer, State as OfferState, Type as OfferType} from '../entity/Offer'
 import * as api from '../api'
-import {ElMessage} from 'element-plus'
+import {ElMessage, ElMessageBox} from 'element-plus'
 import {AxiosError} from 'axios'
 import OfferTypeSelect from '../components/OfferTypeSelect.vue'
 import {typeLabels} from '../labels'
+import {deleteOffer} from '../api'
 
 const store = useStore()
 
@@ -73,6 +74,50 @@ async function onSubmit() {
         offers.push(offer)
         return
     }
+}
+
+const processingIdx = ref(-1)
+
+async function deleteOffer(index: number) {
+    const offer = offers[index]
+    if (offer.state !== OfferState.pending) {
+        const message = '只能删除未响应的请求'
+        ElMessage.error({
+            showClose: true,
+            message,
+        })
+        return console.error(message)
+    }
+    try {
+        await ElMessageBox.confirm('确认删除？', '警告', {
+            confirmButtonText: '是',
+            cancelButtonText: '否',
+            type: 'warning',
+        })
+    } catch {
+        return
+    }
+    if (processingIdx.value >= 0) {
+        ElMessage.error({
+            showClose: true,
+            message: '正在删除中，请稍后再试',
+        })
+        return console.log('processingIdx', processingIdx)
+    }
+    processingIdx.value = index
+    try {
+        await api.deleteOffer(offer.id)
+    } catch (e) {
+        ElMessage.error({
+            showClose: true,
+            message: (e as AxiosError).message,
+        })
+        return console.error(e)
+    } finally {
+        processingIdx.value = -1
+    }
+    offers.splice(index, 1)
+    total.value--
 }
 </script>
 
@@ -192,18 +237,26 @@ async function onSubmit() {
     <ul class="list">
         <li
             class="offer-preview"
-            v-for="offer in offers"
+            v-for="(offer, i) in offers"
             :key="offer.id"
         >
             <el-card
                 class="card"
                 shadow="always"
+                v-loading="processingIdx === i"
             >
                 <template #header>
                     <h3 class="card-title">{{ offer.title }}</h3>
                     <el-button-group size="small" class="btn-group">
-                        <el-button :icon="Delete"/>
-                        <el-button :icon="Edit"/>
+                        <el-tooltip content="删除">
+                            <el-button
+                                :icon="Delete"
+                                @click="deleteOffer(i)"
+                            />
+                        </el-tooltip>
+                        <el-tooltip content="编辑">
+                            <el-button :icon="Edit"/>
+                        </el-tooltip>
                     </el-button-group>
                 </template>
                 <el-text :line-clamp="2" class="desc">{{ offer.desc }}</el-text>
@@ -289,7 +342,7 @@ async function onSubmit() {
 
 .condition-type {
     margin-left: 1em;
-    width: 14em;
+    min-width: 8em;
 }
 
 .list {
