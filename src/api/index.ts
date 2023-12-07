@@ -67,15 +67,21 @@ export async function signup(user: User, validate = true) {
   return obj
 }
 
-export async function findOffers(start: number, end: number) {
-  const data: { list: Offer[], total: number } = await instance.get('/offer', {
-    params: {
-      type: '',
-      title: '',
-      start,
-      end,
-    },
-  })
+export async function findOffers(start: number, end: number, conditions?: { type: number, title: string }) {
+  const params: Record<string, number | string> = {
+    start,
+    end,
+  }
+  if (conditions) {
+    const {type, title} = conditions
+    if (title) {
+      params.title = title
+    }
+    if (type >= 0) {
+      params.type = type
+    }
+  }
+  const data: { list: Offer[], total: number } = await instance.get('/offer', {params})
   for (const offer of data.list) {
     Object.setPrototypeOf(offer, Offer.prototype)
   }

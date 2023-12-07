@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import {Delete, Edit, Avatar, ArrowDown} from '@element-plus/icons-vue'
 import {useStore} from 'vuex'
-import {reactive, ref} from 'vue'
-import {Offer, State as OfferState} from '../entity/Offer'
+import {onMounted, reactive, ref} from 'vue'
+import {Offer, State as OfferState, Type as OfferType} from '../entity/Offer'
 import * as api from '../api'
 import {ElMessage} from 'element-plus'
 import {AxiosError} from 'axios'
+import OfferTypeSelect from '../components/OfferTypeSelect.vue'
+import {typeLabels} from '../labels'
 
 const store = useStore()
 
@@ -13,17 +15,8 @@ const pageSize = 12
 
 const offers = reactive<Offer[]>([])
 const total = ref(0)
-loadPage(1)
+onMounted(loadPage)
 
-const typeLabels = [
-    '钓鱼',
-    '老少皆宜休闲',
-    '农家院',
-    '温泉度假',
-    '僻静休闲',
-    '游乐场',
-    '其他',
-]
 const stateLabels = [
     '已完成',
     '待响应',
@@ -31,12 +24,20 @@ const stateLabels = [
     '到期未达成',
 ]
 
+const conditions = reactive({
+    type: -1,
+    title: '',
+})
+
 async function loadPage(pageNo = 1) {
     const start = (pageNo - 1) * pageSize
     const end = pageNo * pageSize
-    let data: { list: Offer[], total: number }
+    let data: {
+        list: Offer[],
+        total: number
+    }
     try {
-        data = await api.findOffers(start, end)
+        data = await api.findOffers(start, end, conditions)
     } catch (e) {
         ElMessage.error({
             showClose: true,
@@ -118,6 +119,22 @@ async function onSubmit() {
         </el-menu>
         <ul class="toolbar">
             <li>
+                <el-input
+                    v-model="conditions.title"
+                    @change="loadPage(1)"
+                    placeholder="搜索标题"
+                />
+            </li>
+            <li class="condition-type-box">
+                <label>筛选类型</label>
+                <OfferTypeSelect
+                    class="condition-type"
+                    v-model="conditions.type"
+                    @update:model-value="loadPage(1)"
+                    prepend-label="无"
+                />
+            </li>
+            <li>
                 <el-button
                     type="primary"
                     class="publish-btn"
@@ -148,16 +165,7 @@ async function onSubmit() {
                 />
             </el-form-item>
             <el-form-item label="去处类型">
-                <el-select
-                    v-model="offerToPublish.type"
-                >
-                    <el-option
-                        v-for="(label, i) in typeLabels"
-                        :key="label"
-                        :label="label"
-                        :value="i"
-                    />
-                </el-select>
+                <OfferTypeSelect v-model="offerToPublish.type"/>
             </el-form-item>
             <el-form-item label="价格">
                 <el-input-number v-model="offerToPublish.price" class="price-ipt"/>
@@ -268,6 +276,20 @@ async function onSubmit() {
     &:hover {
         color: var(--el-color-primary);
     }
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+}
+
+.condition-type-box {
+    margin: 0 2em;
+}
+
+.condition-type {
+    margin-left: 1em;
+    width: 14em;
 }
 
 .list {

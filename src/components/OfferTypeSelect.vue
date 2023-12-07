@@ -1,15 +1,19 @@
 <script setup>
-const typeLabels = [
-    '钓鱼',
-    '老少皆宜休闲',
-    '农家院',
-    '温泉度假',
-    '僻静休闲',
-    '游乐场',
-    '其他',
-]
+import {typeLabels} from '../labels'
+import {computed} from 'vue'
 
-const props = defineProps(['modelValue'])
+const props = defineProps({
+    modelValue: {
+        type: Number,
+    },
+    prependLabel: {
+        type: String,
+    },
+    prependValue: {
+        type: Number,
+        default: -1,
+    },
+})
 const emit = defineEmits(['update:modelValue'])
 
 const value = computed({
@@ -23,9 +27,12 @@ const value = computed({
 </script>
 
 <template>
-    <el-select
-        v-model="value"
-    >
+    <el-select v-model="value">
+        <el-option
+            v-if="typeof prependLabel === 'string'"
+            :label="prependLabel"
+            :value="prependValue"
+        />
         <el-option
             v-for="(label, i) in typeLabels"
             :key="label"
@@ -34,6 +41,3 @@ const value = computed({
         />
     </el-select>
 </template>
-
-<style scoped>
-</style>
