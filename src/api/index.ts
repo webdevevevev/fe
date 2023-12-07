@@ -3,12 +3,16 @@ import {User} from '../entity/User'
 import {validateOrReject} from 'class-validator'
 import {Offer} from '../entity/Offer'
 
+export * from './district'
+
 const instance = axios.create({
-  baseURL: 'http://localhost:3000',
+  // baseURL: 'http://localhost:3000',
 })
 
 instance.interceptors.request.use(config => {
-  config.headers.setAuthorization('Bearer ' + localStorage.getItem('sign'))
+  const sign = localStorage.getItem('sign')
+  if (sign)
+    config.headers.setAuthorization('Bearer ' + sign)
   return config
 })
 
@@ -18,12 +22,20 @@ export function allUsers() {
   return instance.get<any, User[]>('/user')
 }
 
-export function nickname() {
-  return instance.get<any, string>('/nickname')
+export async function nickname() {
+  if (import.meta.env.DEV) {
+    return instance.get<any, User>(`/user/1`).then(u => u.nickname)
+  }
+  const sign = localStorage.getItem('sign')!
+  const start = sign.indexOf('.') + 1
+  const base64 = sign.substring(start, sign.indexOf('.', start))
+  const payload = JSON.parse(atob(base64))
+  const profile = await instance.get<any, User>(`/user/${payload.id}`)
+  return profile.nickname
 }
 
 export function profile() {
-  return instance.get<any, string>('/profile')
+  return instance.get<any, string>('/user')
 }
 
 export async function signin(name: string, pwd: string) {
@@ -53,18 +65,6 @@ export async function signup(user: User, validate = true) {
   }
   Object.setPrototypeOf(obj, User.prototype)
   return obj
-}
-
-export function getProvinces() {
-  return instance.get<any, { id: number, name: string }[]>('/province')
-}
-
-export function getCities(provinceId: number) {
-  return instance.get<any, { id: number, name: string }[]>(`/province/${provinceId}`)
-}
-
-export function getCityName(provinceId: number, cityId: number) {
-  return instance.get<any, { city: string, province: string }>(`/province/${provinceId}/city/${cityId}`)
 }
 
 export async function findOffers(start: number, end: number) {
