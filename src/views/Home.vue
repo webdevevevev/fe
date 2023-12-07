@@ -294,13 +294,12 @@ async function onSubmit() {
 
 .list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(280px, auto));
     gap: 1em;
     margin: 20px auto 10px;
 }
 
 .offer-preview {
-    min-width: 280px;
     cursor: pointer;
 
     &:hover {
