@@ -121,7 +121,7 @@ async function onSubmit() {
             <li>
                 <el-input
                     v-model="conditions.title"
-                    @change="loadPage(1)"
+                    @input="loadPage(1)"
                     placeholder="搜索标题"
                 />
             </li>
