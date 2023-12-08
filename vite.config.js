@@ -2,8 +2,9 @@ import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({command}) => ({
   plugins: [vue()],
+  base: command === 'serve' ? '/' : '/fe/',
   server: {
     proxy: {
       '^/(?:sign|user|offer|province)': {
@@ -16,13 +17,6 @@ export default defineConfig({
           }
         },
       },
-      '^.+\\..': {
-        bypass(req) {
-          if (req.headers.referer?.includes('github')) {
-            return '/fe'
-          }
-        },
-      },
     },
   },
-})
+}))
