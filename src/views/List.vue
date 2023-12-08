@@ -8,6 +8,7 @@ import {onMounted, reactive, ref} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import * as api from '../api'
 import {AxiosError} from 'axios'
+import {useThrottleFn} from '@vueuse/core'
 
 const pageSize = 12
 
@@ -39,6 +40,8 @@ async function loadPage(pageNo = 1) {
     offers.splice(0, offers.length, ...data.list)
     total.value = data.total
 }
+
+const throttledLoadPage = useThrottleFn(loadPage, 300, true)
 
 const publishDialogVisible = ref(false)
 
@@ -125,7 +128,7 @@ async function deleteOffer(index: number) {
             <li>
                 <el-input
                     v-model="conditions.title"
-                    @input="loadPage(1)"
+                    @input="throttledLoadPage(1)"
                     placeholder="搜索标题"
                 />
             </li>
