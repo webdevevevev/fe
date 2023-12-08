@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  cache-and-install:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,17 +38,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-  build:
-    name: Build
-    needs: cache-and-install
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Build project
         run: pnpm exec vite build --mode development
