@@ -52,7 +52,7 @@ if (store.state.sign) {
         </span>
     </nav>
 
-    <router-view></router-view>
+    <router-view/>
 </template>
 
 <style scoped>

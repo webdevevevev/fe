@@ -162,40 +162,42 @@ async function deleteOffer(index: number) {
             v-for="(offer, i) in offers"
             :key="offer.id"
         >
-            <el-card
-                class="card"
-                shadow="always"
-                v-loading="processingIdx === i"
-            >
-                <template #header>
-                    <h3 class="card-title">{{ offer.title }}</h3>
-                    <el-button-group size="small" class="btn-group">
-                        <el-tooltip content="删除">
-                            <el-button
-                                :icon="Delete"
-                                @click="deleteOffer(i)"
-                            />
+            <router-link to="offer">
+                <el-card
+                    class="card"
+                    shadow="always"
+                    v-loading="processingIdx === i"
+                >
+                    <template #header>
+                        <h3 class="card-title">{{ offer.title }}</h3>
+                        <el-button-group size="small" class="btn-group">
+                            <el-tooltip content="删除">
+                                <el-button
+                                    :icon="Delete"
+                                    @click="deleteOffer(i)"
+                                />
+                            </el-tooltip>
+                            <el-tooltip content="编辑">
+                                <el-button :icon="Edit"/>
+                            </el-tooltip>
+                        </el-button-group>
+                    </template>
+                    <el-text :line-clamp="2" class="desc">{{ offer.desc }}</el-text>
+                    <div class="card-footer">
+                        <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
+                            {{ typeLabels[offer.type] }}
                         </el-tooltip>
-                        <el-tooltip content="编辑">
-                            <el-button :icon="Edit"/>
-                        </el-tooltip>
-                    </el-button-group>
-                </template>
-                <el-text :line-clamp="2" class="desc">{{ offer.desc }}</el-text>
-                <div class="card-footer">
-                    <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
-                        {{ typeLabels[offer.type] }}
-                    </el-tooltip>
-                    <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
+                        <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
                         <span
                             class="offer-state"
                             :class="OfferState[offer.state]"
                         >
                             {{ stateLabels[offer.state] }}
                         </span>
-                    </el-tooltip>
-                </div>
-            </el-card>
+                        </el-tooltip>
+                    </div>
+                </el-card>
+            </router-link>
         </li>
     </ul>
     <el-pagination
@@ -297,13 +299,9 @@ async function deleteOffer(index: number) {
     margin: 20px auto 10px;
 }
 
-.offer-preview {
-    cursor: pointer;
-
-    &:hover {
-        transform: scale(1.02);
-        transition: transform .2s;
-    }
+.offer-preview:hover {
+    transform: scale(1.02);
+    transition: transform .2s;
 }
 
 :deep(.el-card__header) {

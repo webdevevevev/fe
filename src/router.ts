@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
 import Home from './views/Home.vue'
+import List from './views/List.vue'
 import {isSignedIn} from './utils'
 
 declare module 'vue-router' {
@@ -30,10 +31,16 @@ const routes: RouteRecordRaw[] = [
     component: Home,
     meta: {requiresAuth: true},
     children: [{
+      path: '',
+      name: 'list',
+      component: List,
+    }, {
       path: 'offer',
+      name: 'offer',
       component: () => import('./views/Offer.vue'),
     }, {
       path: 'answer',
+      name: 'answer',
       component: () => import('./views/Answer.vue'),
     }],
   },
