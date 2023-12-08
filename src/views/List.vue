@@ -7,7 +7,7 @@ import OfferTypeSelect from '../components/OfferTypeSelect.vue'
 import {onMounted, reactive, ref} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import * as api from '../api'
-import {AxiosError} from 'axios'
+import axios, {AxiosError} from 'axios'
 import {useThrottleFn} from '@vueuse/core'
 
 const pageSize = 12
@@ -21,6 +21,8 @@ const conditions = reactive({
     title: '',
 })
 
+let source = axios.CancelToken.source()
+
 async function loadPage(pageNo = 1) {
     const start = (pageNo - 1) * pageSize
     const end = pageNo * pageSize
@@ -29,12 +31,16 @@ async function loadPage(pageNo = 1) {
         total: number
     }
     try {
-        data = await api.findOffers(start, end, conditions)
+        source.cancel()
+        source = axios.CancelToken.source()
+        data = await api.findOffers(start, end, conditions, source.token)
     } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
+        if (!axios.isCancel(e)) {
+            ElMessage.error({
+                showClose: true,
+                message: (e as AxiosError).message,
+            })
+        }
         return console.error(e)
     }
     offers.splice(0, offers.length, ...data.list)

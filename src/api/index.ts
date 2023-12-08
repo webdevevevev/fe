@@ -2,6 +2,7 @@ import axios from 'axios'
 import {User} from '../entity/User'
 import {validateOrReject} from 'class-validator'
 import {Offer} from '../entity/Offer'
+import {CancelToken} from 'axios/index'
 
 export * from './district'
 
@@ -67,7 +68,12 @@ export async function signup(user: User, validate = true) {
   return obj
 }
 
-export async function findOffers(start: number, end: number, conditions?: { type: number, title: string }) {
+export async function findOffers(
+  start: number,
+  end: number,
+  conditions?: { type: number, title: string },
+  cancelToken?: CancelToken,
+) {
   const params: Record<string, number | string> = {
     start,
     end,
@@ -81,7 +87,10 @@ export async function findOffers(start: number, end: number, conditions?: { type
       params.type = type
     }
   }
-  const data: { list: Offer[], total: number } = await instance.get('/offer', {params})
+  const data: {
+    list: Offer[],
+    total: number
+  } = await instance.get('/offer', {params, cancelToken})
   for (const offer of data.list) {
     Object.setPrototypeOf(offer, Offer.prototype)
   }
