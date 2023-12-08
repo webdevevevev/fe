@@ -261,7 +261,6 @@ async function deleteOffer(index: number) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
 }
 
 .publish-btn {
