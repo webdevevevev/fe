@@ -26,8 +26,9 @@ async function onSubmit() {
     }
     if (typeof signOrMsg === 'object') {
         const {sign} = signOrMsg
-        store.commit('signin', form.name)
+        store.commit('signin', {nickname: form.name, sign})
         localStorage.setItem('sign', sign)
+        store.dispatch('getNickname')
         router.push('/')
     } else {
         ElMessage.error({

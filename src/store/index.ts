@@ -1,19 +1,23 @@
 import {createStore} from 'vuex'
 import * as api from '../api'
+import {useLocalStorage} from '@vueuse/core/index'
 
 export default createStore<{
   nickname?: string
   provinces: { id: number, name: string, cities: { id: number, name: string }[] }[]
+  sign: string | null
 }>({
   state() {
     return {
       nickname: undefined,
       provinces: [],
+      sign: useLocalStorage('sign', '') as any,
     }
   },
   mutations: {
-    signin(state, nickname: string) {
+    signin(state, {nickname, sign}: { nickname: string, sign: string }) {
       state.nickname = nickname
+      state.sign = sign
     },
     getProvinces(state, provinces: { id: number, name: string, cities: { id: number, name: string }[] }[]) {
       state.provinces = provinces
@@ -24,6 +28,9 @@ export default createStore<{
     },
     getNickname(state, nickname: string) {
       state.nickname = nickname
+    },
+    removeSign(state) {
+      state.sign = null
     },
   },
   actions: {

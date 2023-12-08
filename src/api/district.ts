@@ -16,7 +16,7 @@ instance.interceptors.response.use(({data}) => data.districts[0].districts.map((
 })).sort((a, b) => a.id - b.id))
 
 export function getProvinces() {
-  return instance.get('/district', {
+  return instance.get<any, { id: number, name: string }[]>('/district', {
     params: {
       keywords: '100000',
     },
