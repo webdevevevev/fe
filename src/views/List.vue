@@ -9,6 +9,7 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 import * as api from '../api'
 import axios, {AxiosError} from 'axios'
 import {useThrottleFn} from '@vueuse/core'
+import router from '../router'
 
 const pageSize = 12
 
@@ -88,7 +89,7 @@ async function deleteOffer(index: number) {
         return console.error(message)
     }
     try {
-        await ElMessageBox.confirm('确认删除？', '警告', {
+        await ElMessageBox.confirm('确认删除？', undefined, {
             confirmButtonText: '是',
             cancelButtonText: '否',
             type: 'warning',
@@ -164,42 +165,40 @@ async function deleteOffer(index: number) {
             v-for="(offer, i) in offers"
             :key="offer.id"
         >
-            <router-link :to="`offer/${offer.id}`">
-                <el-card
-                    class="card"
-                    shadow="always"
-                    v-loading="processingIdx === i"
-                >
-                    <template #header>
-                        <h3 class="card-title">{{ offer.title }}</h3>
-                        <el-button-group size="small" class="btn-group">
-                            <el-tooltip content="删除">
-                                <el-button
-                                    :icon="Delete"
-                                    @click="deleteOffer(i)"
-                                />
-                            </el-tooltip>
-                            <el-tooltip content="编辑">
-                                <el-button :icon="Edit"/>
-                            </el-tooltip>
-                        </el-button-group>
-                    </template>
-                    <el-text :line-clamp="2" class="desc">{{ offer.desc }}</el-text>
-                    <div class="card-footer">
-                        <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
-                            {{ typeLabels[offer.type] }}
+            <el-card
+                shadow="always"
+                v-loading="processingIdx === i"
+                @click="router.push(`offer/${offer.id}`)"
+            >
+                <template #header>
+                    <h3 class="card-title">{{ offer.title }}</h3>
+                    <el-button-group size="small" class="btn-group" @click.stop>
+                        <el-tooltip content="删除">
+                            <el-button
+                                :icon="Delete"
+                                @click="deleteOffer(i)"
+                            />
                         </el-tooltip>
-                        <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
+                        <el-tooltip content="编辑">
+                            <el-button :icon="Edit" @click=""/><!--todo impl click-->
+                        </el-tooltip>
+                    </el-button-group>
+                </template>
+                <el-text :line-clamp="2" class="desc">{{ offer.desc }}</el-text>
+                <div class="card-footer">
+                    <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
+                        {{ typeLabels[offer.type] }}
+                    </el-tooltip>
+                    <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
                         <span
                             class="offer-state"
                             :class="OfferState[offer.state]"
                         >
                             {{ stateLabels[offer.state] }}
                         </span>
-                        </el-tooltip>
-                    </div>
-                </el-card>
-            </router-link>
+                    </el-tooltip>
+                </div>
+            </el-card>
         </li>
     </ul>
     <el-pagination
@@ -298,6 +297,10 @@ async function deleteOffer(index: number) {
     grid-template-columns: repeat(auto-fill, minmax(280px, auto));
     gap: 1em;
     margin: 20px auto 10px;
+}
+
+.offer-preview {
+    cursor: pointer;
 }
 
 .offer-preview:hover {
