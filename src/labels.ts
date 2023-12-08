@@ -7,3 +7,10 @@ export const typeLabels = [
   '游乐场',
   '其他',
 ]
+
+export const stateLabels = [
+  '已完成',
+  '待响应',
+  '已取消',
+  '到期未达成',
+]

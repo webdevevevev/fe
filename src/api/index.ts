@@ -97,4 +97,8 @@ export function deleteOffer(id: number) {
   return instance.delete(`/offer/${id}`)
 }
 
+export function getOffer(id: number) {
+  return instance.get<any, Offer>(`/offer/${id}`)
+}
+
 export default instance

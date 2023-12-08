@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {Delete, Edit} from '@element-plus/icons-vue'
 import {deleteOffer} from '../api'
-import {typeLabels} from '../labels'
+import {stateLabels, typeLabels} from '../labels'
 import {Offer, State as OfferState} from '../entity/Offer'
 import OfferTypeSelect from '../components/OfferTypeSelect.vue'
 import {onMounted, reactive, ref} from 'vue'
@@ -14,13 +14,6 @@ const pageSize = 12
 const offers = reactive<Offer[]>([])
 const total = ref(0)
 onMounted(loadPage)
-
-const stateLabels = [
-    '已完成',
-    '待响应',
-    '已取消',
-    '到期未达成',
-]
 
 const conditions = reactive({
     type: -1,
@@ -162,7 +155,7 @@ async function deleteOffer(index: number) {
             v-for="(offer, i) in offers"
             :key="offer.id"
         >
-            <router-link to="offer">
+            <router-link :to="`offer/${offer.id}`">
                 <el-card
                     class="card"
                     shadow="always"

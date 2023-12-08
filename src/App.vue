@@ -59,6 +59,7 @@ if (store.state.sign) {
 .nav {
     display: flex;
     justify-content: space-between;
+    padding-bottom: 1em;
 }
 
 .dropdown {
