@@ -10,9 +10,16 @@ export default defineConfig({
         target: 'https://mock.apifox.com/m1/3672598-0-default',
         changeOrigin: true,
         secure: false,
-        bypass(req, res, options) {
+        bypass(req) {
           if (!req.headers?.authorization) {
             return '/'
+          }
+        },
+      },
+      '^.+\\..': {
+        bypass(req) {
+          if (req.headers.referer?.includes('github')) {
+            return '/fe'
           }
         },
       },
