@@ -67,6 +67,7 @@ if (store.state.sign) {
 }
 
 .dropdown-menu a {
+    width: 100%;
     color: unset;
 }
 
