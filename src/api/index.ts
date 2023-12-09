@@ -3,6 +3,7 @@ import {User} from '../entity/User'
 import {validateOrReject} from 'class-validator'
 import {Offer} from '../entity/Offer'
 import {CancelToken} from 'axios/index'
+import {Answer} from '../entity/Answer'
 
 export * from './district'
 
@@ -112,6 +113,10 @@ export function deleteOffer(id: number) {
 
 export function getOffer(id: number) {
   return instance.get<any, Offer>(`/offer/${id}`)
+}
+
+export function getAnswer(id: number) {
+  return instance.get<any, Answer>(`/answer/${id}`)
 }
 
 export default instance
