@@ -190,9 +190,18 @@ async function deleteOffer(index: number) {
                         {{ typeLabels[offer.type] }}
                     </el-tooltip>
                     <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
+                        <el-badge :value="offer.answerIds.length" v-if="offer.state === OfferState.pending">
+                            <span
+                                class="offer-state"
+                                :class="OfferState[offer.state]"
+                            >
+                                {{ stateLabels[offer.state] }}
+                            </span>
+                        </el-badge>
                         <span
                             class="offer-state"
                             :class="OfferState[offer.state]"
+                            v-else
                         >
                             {{ stateLabels[offer.state] }}
                         </span>
@@ -342,6 +351,7 @@ async function deleteOffer(index: number) {
     align-items: center;
     margin-top: .6em;
     padding-top: .4em;
+    height: 2em;
     border-top: 1px solid #ccc;
 }
 

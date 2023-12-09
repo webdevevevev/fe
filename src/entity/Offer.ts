@@ -44,11 +44,11 @@ export class Offer {
 
   // 请求主题名称
   @MaxLength(255)
-  title=''
+  title = ''
 
   // 请求描述
   @MaxLength(255)
-  desc= ''
+  desc = ''
 
   // 去处类比图片介绍等文件
   @ArrayMaxSize(20)
@@ -73,4 +73,6 @@ export class Offer {
   @Min(0)
   @Max(3)
   state = State.pending
+
+  answerIds: number[] = []
 }
