@@ -397,7 +397,7 @@ function onEditOffer(offer: Offer) {
 
 .delete-btn:active {
     background-color: var(--el-color-danger-light-3);
-    border-color: var(--el-color-danger-light);
+    border-color: var(--el-color-danger);
 }
 
 .desc {

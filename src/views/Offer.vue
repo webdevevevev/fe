@@ -5,6 +5,7 @@ import * as api from '../api'
 import {ElMessage} from 'element-plus'
 import {stateLabels, typeLabels} from '../labels'
 import {Answer} from '../entity/Answer'
+import {Select, CloseBold} from '@element-plus/icons-vue'
 
 const props = defineProps({
     id: {
@@ -17,13 +18,11 @@ const offer = reactive(new Offer())
 ;(offer as any).id = Number(props.id)
 const answers = reactive<Answer[]>([])
 
-function init(offer: Offer, answers: Answer[]) {
-    return api.getOffer(offer.id)
-        .then(o => {
-            Object.assign(offer, o)
-            return Promise.all(o.answerIds.map(id => api.getAnswer(id)))
-        })
-        .then(as => answers.push(...as))
+async function init(offer: Offer, answers: Answer[]) {
+    const o = await api.getOffer(offer.id)
+    Object.assign(offer, o)
+    const as = await Promise.all(o.answerIds.map(id_1 => api.getAnswer(id_1)))
+    return answers.push(...as)
 }
 
 init(offer, answers).catch(e => {
@@ -72,14 +71,37 @@ init(offer, answers).catch(e => {
             <h3 class="aside-header">欢迎来列表</h3>
             <ul class="list">
                 <li
-                    v-for="(answer, i) of answers"
+                    v-for="answer of answers"
                     :key="answer.id"
+                    class="answer-preview"
                 >
                     <el-card
                         shadow="hover"
-                        header="nickname"
                     >
-                        <el-text :line-clamp="2" class="desc">{{ answer.desc }}</el-text>
+                        <template #header>
+                            <h4 class="card-title">nickname</h4>
+                            <el-button-group size="small" @click.stop>
+                                <el-tooltip content="接受">
+                                    <el-button :icon="Select" @click=""/>
+                                </el-tooltip>
+                                <el-tooltip content="拒绝">
+                                    <el-button
+                                        class="reject-btn"
+                                        @click=""
+                                    >
+                                        <el-icon color="red">
+                                            <CloseBold/>
+                                        </el-icon>
+                                    </el-button>
+                                </el-tooltip>
+                            </el-button-group>
+                        </template>
+                        <el-text :line-clamp="2" class="answer-desc">{{ answer.desc }}</el-text>
+                        <template #footer>
+                            <div class="card-footer">
+                                {{ answer.ctime }}
+                            </div>
+                        </template>
                     </el-card>
                 </li>
             </ul>
@@ -117,6 +139,10 @@ init(offer, answers).catch(e => {
 
 .time {
     margin-top: 1em;
+}
+
+.time,
+.card-footer {
     color: var(--el-text-color-regular);
 }
 
@@ -140,8 +166,48 @@ init(offer, answers).catch(e => {
     height: 2em;
 }
 
-.list {
+.answer-preview {
     margin-top: 1em;
+    cursor: pointer;
+}
+
+:deep(.el-card__header) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    padding-top: 1em;
+    padding-bottom: 1em;
+
+    background-color: var(--el-color-primary-dark-2);
+    color: #fff;
+}
+
+.card-title {
+    flex: 1;
+    margin-right: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.reject-btn:hover {
+    background-color: var(--el-color-danger-light-7);
+    border-color: var(--el-color-danger-light-3);
+}
+
+.reject-btn:active {
+    background-color: var(--el-color-danger-light-3);
+    border-color: var(--el-color-danger);
+}
+
+.answer-desc {
+    height: 3em;
+}
+
+:deep(.el-card__footer) {
+    padding-top: 0;
+    padding-bottom: .4em;
 }
 
 .fulfilled {

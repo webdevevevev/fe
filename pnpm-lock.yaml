@@ -18,8 +18,8 @@ dependencies:
     specifier: ^0.14.0
     version: registry.npmmirror.com/class-validator@0.14.0
   element-plus:
-    specifier: ^2.4.2
-    version: registry.npmmirror.com/element-plus@2.4.2(vue@3.3.7)
+    specifier: ^2.4.3
+    version: registry.npmmirror.com/element-plus@2.4.3(vue@3.3.7)
   vue:
     specifier: ^3.3.4
     version: registry.npmmirror.com/vue@3.3.7
@@ -83,6 +83,17 @@ packages:
     id: registry.npmmirror.com/@element-plus/icons-vue/2.1.0
     name: '@element-plus/icons-vue'
     version: 2.1.0
+    peerDependencies:
+      vue: ^3.2.0
+    dependencies:
+      vue: registry.npmmirror.com/vue@3.3.7
+    dev: false
+
+  registry.npmmirror.com/@element-plus/icons-vue@2.3.1(vue@3.3.7):
+    resolution: {integrity: sha512-XxVUZv48RZAd87ucGS48jPf6pKu0yV5UCg9f4FFwtrYxXOwWuVJo6wOvSLKEoMQKjv8GsX/mhP6UsC1lRwbUWg==, tarball: https://registry.npmmirror.com/@element-plus/icons-vue/-/icons-vue-2.3.1.tgz}
+    id: registry.npmmirror.com/@element-plus/icons-vue/2.3.1
+    name: '@element-plus/icons-vue'
+    version: 2.3.1
     peerDependencies:
       vue: ^3.2.0
     dependencies:
@@ -638,16 +649,16 @@ packages:
     engines: {node: '>=0.4.0'}
     dev: false
 
-  registry.npmmirror.com/element-plus@2.4.2(vue@3.3.7):
-    resolution: {integrity: sha512-E/HwXX7JF1LPvQSjs0fZ8WblIoc0quoXsRXQZiL7QDq7xJdNGSUaXtdk7xiEv7axPmLfEFtxE5du9fFspDrmJw==, tarball: https://registry.npmmirror.com/element-plus/-/element-plus-2.4.2.tgz}
-    id: registry.npmmirror.com/element-plus/2.4.2
+  registry.npmmirror.com/element-plus@2.4.3(vue@3.3.7):
+    resolution: {integrity: sha512-b3q26j+lM4SBqiyzw8HybybGnP2pk4MWgrnzzzYW5qKQUgV6EG1Zg7nMCfgCVccI8tNvZoTiUHb2mFaiB9qT8w==, tarball: https://registry.npmmirror.com/element-plus/-/element-plus-2.4.3.tgz}
+    id: registry.npmmirror.com/element-plus/2.4.3
     name: element-plus
-    version: 2.4.2
+    version: 2.4.3
     peerDependencies:
       vue: ^3.2.0
     dependencies:
       '@ctrl/tinycolor': registry.npmmirror.com/@ctrl/tinycolor@3.6.1
-      '@element-plus/icons-vue': registry.npmmirror.com/@element-plus/icons-vue@2.1.0(vue@3.3.7)
+      '@element-plus/icons-vue': registry.npmmirror.com/@element-plus/icons-vue@2.3.1(vue@3.3.7)
       '@floating-ui/dom': registry.npmmirror.com/@floating-ui/dom@1.5.3
       '@popperjs/core': registry.npmmirror.com/@sxzz/popperjs-es@2.11.7
       '@types/lodash': registry.npmmirror.com/@types/lodash@4.14.201
