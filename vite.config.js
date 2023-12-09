@@ -2,9 +2,9 @@ import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
-export default defineConfig(({command}) => ({
+export default defineConfig(({command, mode}) => ({
   plugins: [vue()],
-  base: command === 'serve' ? '/' : '/fe/',
+  base: command === 'build' && mode === 'development' ? '/fe' : '/',
   server: {
     proxy: {
       '^/(?:sign|user|offer|province)': {

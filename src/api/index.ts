@@ -7,7 +7,7 @@ import {CancelToken} from 'axios/index'
 export * from './district'
 
 const instance = axios.create({
-  // baseURL: 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_BASE,
 })
 
 instance.interceptors.request.use(config => {
@@ -24,7 +24,7 @@ export function allUsers() {
 }
 
 export async function nickname() {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.MODE !== 'production') {
     return instance.get<any, User>(`/user/1`).then(u => u.nickname)
   }
   const sign = localStorage.getItem('sign')!
