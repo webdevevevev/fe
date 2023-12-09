@@ -172,12 +172,16 @@ async function deleteOffer(index: number) {
             >
                 <template #header>
                     <h3 class="card-title">{{ offer.title }}</h3>
-                    <el-button-group size="small" class="btn-group" @click.stop>
+                    <el-button-group size="small" @click.stop>
                         <el-tooltip content="删除">
                             <el-button
-                                :icon="Delete"
+                                class="delete-btn"
                                 @click="deleteOffer(i)"
-                            />
+                            >
+                                <el-icon color="red">
+                                    <Delete/>
+                                </el-icon>
+                            </el-button>
                         </el-tooltip>
                         <el-tooltip content="编辑">
                             <el-button :icon="Edit" @click=""/><!--todo impl click-->
@@ -337,8 +341,14 @@ async function deleteOffer(index: number) {
     white-space: nowrap;
 }
 
-.btn-group {
-    flex: none;
+.delete-btn:hover {
+    background-color: var(--el-color-danger-light-7);
+    border-color: var(--el-color-danger-light-3);
+}
+
+.delete-btn:active {
+    background-color: var(--el-color-danger-light-3);
+    border-color: var(--el-color-danger-light);
 }
 
 .desc {
