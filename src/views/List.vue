@@ -4,7 +4,7 @@ import {deleteOffer} from '../api'
 import {stateLabels, typeLabels} from '../labels'
 import {Offer, State as OfferState} from '../entity/Offer'
 import OfferTypeSelect from '../components/OfferTypeSelect.vue'
-import {onMounted, reactive, ref} from 'vue'
+import {computed, onMounted, reactive, ref} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import * as api from '../api'
 import axios, {AxiosError} from 'axios'
@@ -50,22 +50,24 @@ async function loadPage(pageNo = 1) {
 
 const throttledLoadPage = useThrottleFn(loadPage, 300, true)
 
-const publishDialogVisible = ref(false)
+const enum DialogType {
+    publish,
+    edit,
+}
+
+const dialogTypeLabel = [
+    '发布',
+    '编辑',
+]
 
 let offerToPublish = reactive(new Offer())
 
-async function onSubmit() {
-    publishDialogVisible.value = false
-    let id: number
-    try {
-        id = await api.publishOffer(offerToPublish)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        return console.error(e)
-    }
+const dialogVisible = ref(false)
+const dialogType = ref(DialogType.publish)
+const dialogOffer = ref(offerToPublish)
+
+async function publishOffer() {
+    const id = await api.publishOffer(offerToPublish)
     const offer = offerToPublish
     offerToPublish = new Offer()
     ;(offer as any).id = id
@@ -73,6 +75,38 @@ async function onSubmit() {
     if (offers.length < pageSize) {
         offers.push(offer)
         return
+    }
+}
+
+function matches(offer: Offer, conditions: { type: number, title: string }) {
+    return (conditions.type < 0 || offer.type === conditions.type)
+        && offer.title.includes(conditions.title)
+}
+
+async function editOffer() {
+    const offer = dialogOffer.value
+
+    await api.updateOffer(offer)
+
+    if (!matches(offer, conditions)) {
+        await loadPage()
+    }
+}
+
+function onSubmit() {
+    dialogVisible.value = false
+    try {
+        if (dialogType.value === DialogType.publish) {
+            publishOffer()
+        } else {
+            editOffer()
+        }
+    } catch (e) {
+        ElMessage.error({
+            showClose: true,
+            message: (e as AxiosError).message,
+        })
+        return console.error(e)
     }
 }
 
@@ -119,6 +153,18 @@ async function deleteOffer(index: number) {
     offers.splice(index, 1)
     total.value--
 }
+
+function onPublishOffer() {
+    dialogVisible.value = true
+    dialogType.value = DialogType.publish
+    dialogOffer.value = offerToPublish
+}
+
+function onEditOffer(offer: Offer) {
+    dialogVisible.value = true
+    dialogType.value = DialogType.edit
+    dialogOffer.value = offer
+}
 </script>
 
 <template>
@@ -152,7 +198,7 @@ async function deleteOffer(index: number) {
                 <el-button
                     type="primary"
                     class="publish-btn"
-                    @click="publishDialogVisible = true"
+                    @click="onPublishOffer"
                 >
                     发布请求
                 </el-button>
@@ -184,7 +230,7 @@ async function deleteOffer(index: number) {
                             </el-button>
                         </el-tooltip>
                         <el-tooltip content="编辑">
-                            <el-button :icon="Edit" @click=""/><!--todo impl click-->
+                            <el-button :icon="Edit" @click="onEditOffer(offer)"/>
                         </el-tooltip>
                     </el-button-group>
                 </template>
@@ -222,35 +268,38 @@ async function deleteOffer(index: number) {
         :total="total"
         background
     />
-    <el-dialog v-model="publishDialogVisible" title="发布新请求">
+    <el-dialog
+        v-model="dialogVisible"
+        :title="dialogTypeLabel[dialogType] + '请求'"
+    >
         <el-form
-            :model="offerToPublish"
+            :model="dialogOffer"
             class="publish-form"
             label-width="80px"
         >
             <el-form-item label="主题名称">
                 <el-input
-                    v-model="offerToPublish.title"
+                    v-model="dialogOffer.title"
                     autocomplete="off"
                 />
             </el-form-item>
             <el-form-item label="描述">
                 <el-input
-                    v-model="offerToPublish.desc"
+                    v-model="dialogOffer.desc"
                     type="textarea"
                     autocomplete="off"
                 />
             </el-form-item>
             <el-form-item label="去处类型">
-                <OfferTypeSelect v-model="offerToPublish.type"/>
+                <OfferTypeSelect v-model="dialogOffer.type"/>
             </el-form-item>
             <el-form-item label="价格">
-                <el-input-number v-model="offerToPublish.price" class="price-ipt"/>
+                <el-input-number v-model="dialogOffer.price" class="price-ipt"/>
                 <span class="unit">元</span>
             </el-form-item>
             <el-form-item label="过期时间">
                 <el-date-picker
-                    v-model="offerToPublish.expire"
+                    v-model="dialogOffer.expire"
                     type="datetime"
                     placeholder="选择日期及时间"
                     format="YYYY/MM/DD HH:mm:ss"
@@ -259,7 +308,7 @@ async function deleteOffer(index: number) {
         </el-form>
         <template #footer>
           <span class="dialog-footer">
-            <el-button @click="publishDialogVisible = false">取消</el-button>
+            <el-button @click="dialogVisible = false">取消</el-button>
             <el-button type="primary" @click="onSubmit">
               提交
             </el-button>

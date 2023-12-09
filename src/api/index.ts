@@ -102,6 +102,10 @@ export async function publishOffer(offer: Offer) {
   return obj.insertId
 }
 
+export async function updateOffer(offer: Offer) {
+  return instance.put(`/offer/${offer.id}`, offer)
+}
+
 export function deleteOffer(id: number) {
   return instance.delete(`/offer/${id}`)
 }
