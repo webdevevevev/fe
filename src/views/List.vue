@@ -17,11 +17,24 @@ const offers = reactive<Offer[]>([])
 const total = ref(0)
 onMounted(loadPage)
 
-const selectedMenu = ref('offer')
+const enum Menu {
+    offer,
+    local,
+    answer,
+}
 
-function onSelectMenu(name: string) {
-    if (name !== selectedMenu.value) {
-        selectedMenu.value = name
+const menuLabels = [
+    '寻去处',
+    '欢迎来',
+    '我的响应',
+]
+
+const selectedMenu = ref(Menu.offer)
+
+function onSelectMenu(selected: string) {
+    const selectedNum = parseInt(selected)
+    if (selectedNum !== selectedMenu.value) {
+        selectedMenu.value = selectedNum
         loadPage()
     }
 }
@@ -43,7 +56,7 @@ async function loadPage(pageNo = 1) {
         total: number
     }
 
-    const apiCall = selectedMenu.value === 'offer'
+    const apiCall = selectedMenu.value !== Menu.answer
         ? api.findOffers
         : api.findOffersSameCity
     loadingPage.value = true
@@ -190,11 +203,15 @@ function onEditOffer(offer: Offer) {
         <el-menu
             mode="horizontal"
             class="tabs"
-            default-active="offer"
+            :default-active="Menu.offer.toString()"
             @select="onSelectMenu"
         >
-            <el-menu-item index="offer">寻去处</el-menu-item>
-            <el-menu-item index="answer">欢迎来</el-menu-item>
+            <el-menu-item
+                v-for="(label, i) of menuLabels"
+                :index="i.toString()"
+            >
+                {{ label }}
+            </el-menu-item>
         </el-menu>
         <ul class="toolbar">
             <li>
@@ -238,7 +255,7 @@ function onEditOffer(offer: Offer) {
                 <template #header>
                     <h3 class="card-title">{{ offer.title }}</h3>
                     <el-button-group
-                        v-if="selectedMenu === 'offer'"
+                        v-if="selectedMenu === Menu.offer"
                         size="small"
                         @click.stop
                     >
