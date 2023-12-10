@@ -40,6 +40,10 @@ export function profile() {
   return instance.get<any, string>('/user')
 }
 
+export function getPublicProfile(id: number) {
+  return instance.get<any, User>(`/user/${id}`)
+}
+
 export async function signin(name: string, pwd: string) {
   const maxLength = 50
   if (name.length > maxLength) {
@@ -115,8 +119,12 @@ export function getOffer(id: number) {
   return instance.get<any, Offer>(`/offer/${id}`)
 }
 
-export function getAnswer(id: number) {
-  return instance.get<any, Answer>(`/answer/${id}`)
+export async function getAnswer(id: number) {
+  const obj: any = await instance.get(`/answer/${id}`)
+  obj.user = {id: obj.userId}
+  delete obj.userId
+  Object.setPrototypeOf(obj, Answer.prototype)
+  return obj
 }
 
 export default instance

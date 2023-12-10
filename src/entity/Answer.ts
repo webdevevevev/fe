@@ -22,7 +22,7 @@ export class Answer {
   offer: Offer
 
   // 响应用户标识
-  user: User
+  user = new User()
 
   // 响应描述
   @MaxLength(255)

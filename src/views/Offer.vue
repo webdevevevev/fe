@@ -21,8 +21,14 @@ const answers = reactive<Answer[]>([])
 async function init(offer: Offer, answers: Answer[]) {
     const o = await api.getOffer(offer.id)
     Object.assign(offer, o)
-    const as = await Promise.all(o.answerIds.map(id_1 => api.getAnswer(id_1)))
-    return answers.push(...as)
+    const as = await Promise.all(o.answerIds.map(id => api.getAnswer(id)))
+    answers.push(...as)
+    for (const answer of answers) {
+        api.getPublicProfile(answer.user.id)
+            .then(profile => {
+                answer.user = profile
+            })
+    }
 }
 
 init(offer, answers).catch(e => {
@@ -79,7 +85,7 @@ init(offer, answers).catch(e => {
                         shadow="hover"
                     >
                         <template #header>
-                            <h4 class="card-title">nickname</h4>
+                            <h4 class="card-title">{{ answer.user.nickname }}</h4>
                             <el-button-group size="small" @click.stop>
                                 <el-tooltip content="接受">
                                     <el-button :icon="Select" @click=""/>
@@ -169,6 +175,11 @@ init(offer, answers).catch(e => {
 .answer-preview {
     margin-top: 1em;
     cursor: pointer;
+}
+
+.answer-preview:hover {
+    transform: scale(1.02);
+    transition: transform .2s;
 }
 
 :deep(.el-card__header) {
