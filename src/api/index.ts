@@ -130,4 +130,8 @@ export function reject(id: number) {
   return instance.post(`/reject/${id}`)
 }
 
+export function findOffersSameCity(start: number, end: number): Promise<{ list: Offer[], total: number }> {
+  return instance.get('/answer', {params: {start, end}})
+}
+
 export default instance

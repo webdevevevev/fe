@@ -17,12 +17,23 @@ const offers = reactive<Offer[]>([])
 const total = ref(0)
 onMounted(loadPage)
 
+const selectedMenu = ref('offer')
+
+function onSelectMenu(name: string) {
+    if (name !== selectedMenu.value) {
+        selectedMenu.value = name
+        loadPage()
+    }
+}
+
 const conditions = reactive({
     type: -1,
     title: '',
 })
 
 let source = axios.CancelToken.source()
+
+const loadingPage = ref(false)
 
 async function loadPage(pageNo = 1) {
     const start = (pageNo - 1) * pageSize
@@ -31,10 +42,15 @@ async function loadPage(pageNo = 1) {
         list: Offer[],
         total: number
     }
+
+    const apiCall = selectedMenu.value === 'offer'
+        ? api.findOffers
+        : api.findOffersSameCity
+    loadingPage.value = true
     try {
         source.cancel()
         source = axios.CancelToken.source()
-        data = await api.findOffers(start, end, conditions, source.token)
+        data = await apiCall(start, end, conditions, source.token)
     } catch (e) {
         if (!axios.isCancel(e)) {
             ElMessage.error({
@@ -43,6 +59,8 @@ async function loadPage(pageNo = 1) {
             })
         }
         return console.error(e)
+    } finally {
+        loadingPage.value = false
     }
     offers.splice(0, offers.length, ...data.list)
     total.value = data.total
@@ -173,6 +191,7 @@ function onEditOffer(offer: Offer) {
             mode="horizontal"
             class="tabs"
             default-active="offer"
+            @select="onSelectMenu"
         >
             <el-menu-item index="offer">寻去处</el-menu-item>
             <el-menu-item index="answer">欢迎来</el-menu-item>
@@ -205,7 +224,7 @@ function onEditOffer(offer: Offer) {
             </li>
         </ul>
     </div>
-    <ul class="list">
+    <ul class="list" v-loading="loadingPage">
         <li
             class="offer-preview"
             v-for="(offer, i) in offers"
@@ -218,7 +237,11 @@ function onEditOffer(offer: Offer) {
             >
                 <template #header>
                     <h3 class="card-title">{{ offer.title }}</h3>
-                    <el-button-group size="small" @click.stop>
+                    <el-button-group
+                        v-if="selectedMenu === 'offer'"
+                        size="small"
+                        @click.stop
+                    >
                         <el-tooltip content="删除">
                             <el-button
                                 class="delete-btn"
