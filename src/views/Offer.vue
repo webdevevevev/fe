@@ -118,8 +118,7 @@ init(offer, answers).catch(e => {
 <style scoped>
 .main {
     display: flex;
-    gap: 2em;
-    padding: 0 3em;
+    padding-left: 3em;
 }
 
 .header {
@@ -158,6 +157,9 @@ init(offer, answers).catch(e => {
 
 .article {
     flex: 1;
+    height: calc(100vh - 2em - 3.2em - 2em);
+    padding-right: 2em;
+    overflow-y: auto;
 }
 
 .desc {
@@ -166,10 +168,17 @@ init(offer, answers).catch(e => {
 
 .aside {
     width: 300px;
+    padding: 0 1em;
 }
 
 .aside-header {
     height: 2em;
+}
+
+.list {
+    height: calc(100vh - 2em - 3.2em - 2em - 1em - 1em);
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .answer-preview {
