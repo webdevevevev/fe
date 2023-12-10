@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import {reactive} from 'vue'
 import {Offer, State as OfferState} from '../entity/Offer'
+import {State as AnswerState} from '../entity/Answer'
 import * as api from '../api'
 import {ElMessage} from 'element-plus'
 import {stateLabels, typeLabels} from '../labels'
 import {Answer} from '../entity/Answer'
 import {Select, CloseBold} from '@element-plus/icons-vue'
+import {AxiosError} from 'axios'
 
 const props = defineProps({
     id: {
@@ -38,6 +40,21 @@ init(offer, answers).catch(e => {
     })
     console.error(e)
 })
+
+async function onReject(i: number) {
+    const answer = answers[i]
+    try {
+        await api.reject(answer.id)
+    } catch (e) {
+        ElMessage.error({
+            showClose: true,
+            message: (e as AxiosError).message,
+        })
+        console.error(e)
+    }
+    answer.state = AnswerState.rejected
+    answers.splice(i, 1)
+}
 </script>
 
 <template>
@@ -77,7 +94,7 @@ init(offer, answers).catch(e => {
             <h3 class="aside-header">欢迎来列表</h3>
             <ul class="list">
                 <li
-                    v-for="answer of answers"
+                    v-for="(answer, i) of answers"
                     :key="answer.id"
                     class="answer-preview"
                 >
@@ -93,7 +110,7 @@ init(offer, answers).catch(e => {
                                 <el-tooltip content="拒绝">
                                     <el-button
                                         class="reject-btn"
-                                        @click=""
+                                        @click="onReject(i)"
                                     >
                                         <el-icon color="red">
                                             <CloseBold/>

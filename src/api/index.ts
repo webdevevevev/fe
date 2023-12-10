@@ -127,4 +127,8 @@ export async function getAnswer(id: number) {
   return obj
 }
 
+export function reject(id: number) {
+  return instance.post(`/reject/${id}`)
+}
+
 export default instance
