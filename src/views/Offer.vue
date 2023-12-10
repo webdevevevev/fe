@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {reactive, ref} from 'vue'
+import {computed, reactive, ref} from 'vue'
 import {Offer, State as OfferState} from '../entity/Offer'
 import {State as AnswerState} from '../entity/Answer'
 import * as api from '../api'
@@ -8,6 +8,10 @@ import {stateLabels, typeLabels} from '../labels'
 import {Answer} from '../entity/Answer'
 import {Select, CloseBold} from '@element-plus/icons-vue'
 import {AxiosError} from 'axios'
+import {useStore} from 'vuex'
+import {User} from '../entity/User'
+
+const store = useStore()
 
 const props = defineProps({
     id: {
@@ -21,9 +25,12 @@ const offer = reactive(new Offer())
 const answers = reactive<Answer[]>([])
 
 async function init(offer: Offer, answers: Answer[]) {
-    const o = await api.getOffer(offer.id)
+    const o: Record<string, any> = await api.getOffer(offer.id)
+    o.user = new User()
+    o.user.id = o.userId
+    delete o.userId
     Object.assign(offer, o)
-    const as = await Promise.all(o.answerIds.map(id => api.getAnswer(id)))
+    const as = await Promise.all(offer.answerIds.map(id => api.getAnswer(id)))
     answers.push(...as)
     for (const answer of answers) {
         api.getPublicProfile(answer.user.id)
@@ -58,10 +65,14 @@ async function onReject(i: number) {
 
 const dialogVisible = ref(false)
 let dialogAnswer = reactive(newAnswer())
+const publishDisabled = computed(() => {
+    return offer.user?.id === store.getters.userId
+        || offer.state !== OfferState.pending
+})
 
 function newAnswer() {
     const answer: Record<string, any> = new Answer()
-    answer.userId = 1
+    answer.userId = store.getters.userId
     answer.offerId = offer.id
     return answer as Answer
 }
@@ -108,6 +119,7 @@ async function publishAnswer() {
                 <el-button
                     type="primary"
                     class="publish-btn"
+                    :disabled="publishDisabled"
                     @click="dialogVisible = true"
                 >
                     发布响应

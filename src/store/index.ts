@@ -1,6 +1,7 @@
 import {createStore} from 'vuex'
 import * as api from '../api'
 import {useLocalStorage} from '@vueuse/core/index'
+import {parseSign} from '../utils'
 
 export default createStore<{
   nickname?: string
@@ -13,6 +14,11 @@ export default createStore<{
       provinces: [],
       sign: useLocalStorage('sign', '') as any,
     }
+  },
+  getters: {
+    userId({sign}) {
+      return sign ? parseSign(sign).id : undefined
+    },
   },
   mutations: {
     signin(state, {nickname, sign}: { nickname: string, sign: string }) {
@@ -45,8 +51,8 @@ export default createStore<{
         cities,
       })
     },
-    async getNickname({commit}) {
-      commit('getNickname', await api.nickname())
+    async getNickname({commit, getters}) {
+      commit('getNickname', await api.nickname(getters.userId))
     },
   },
 })

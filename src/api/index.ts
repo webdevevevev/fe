@@ -25,13 +25,8 @@ export function allUsers() {
   return instance.get<any, User[]>('/user')
 }
 
-export async function nickname() {
-  if (import.meta.env.MODE !== 'production') {
-    return instance.get<any, User>(`/user/1`).then(u => u.nickname)
-  }
-  const sign = localStorage.getItem('sign')!
-  const payload = parseSign(sign)
-  const profile = await instance.get<any, User>(`/user/${payload.id}`)
+export async function nickname(id: number) {
+  const profile = await instance.get<any, User>(`/user/${id}`)
   return profile.nickname
 }
 
