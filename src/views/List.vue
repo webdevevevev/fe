@@ -31,10 +31,11 @@ const menuLabels = [
 
 const selectedMenu = ref(Menu.offer)
 
-function onSelectMenu(selected: string) {
-    const selectedNum = parseInt(selected)
-    if (selectedNum !== selectedMenu.value) {
-        selectedMenu.value = selectedNum
+function onSelectMenu(selectedStr: string) {
+    const selected = parseInt(selectedStr)
+    if (selected !== selectedMenu.value) {
+        selectedMenu.value = selected
+        conditions.local = selected === Menu.local
         loadPage()
     }
 }
@@ -42,6 +43,7 @@ function onSelectMenu(selected: string) {
 const conditions = reactive({
     type: -1,
     title: '',
+    local: false,
 })
 
 let source = axios.CancelToken.source()
@@ -56,14 +58,11 @@ async function loadPage(pageNo = 1) {
         total: number
     }
 
-    const apiCall = selectedMenu.value !== Menu.answer
-        ? api.findOffers
-        : api.findOffersSameCity
     loadingPage.value = true
     try {
         source.cancel()
         source = axios.CancelToken.source()
-        data = await apiCall(start, end, conditions, source.token)
+        data = await api.findOffers(start, end, conditions, source.token)
     } catch (e) {
         if (!axios.isCancel(e)) {
             ElMessage.error({

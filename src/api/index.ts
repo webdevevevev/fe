@@ -70,7 +70,7 @@ export async function signup(user: User, validate = true) {
 export async function findOffers(
   start: number,
   end: number,
-  conditions?: { type: number, title: string },
+  conditions?: { type: number, title: string, local: boolean },
   cancelToken?: CancelToken,
 ) {
   const params: Record<string, number | string> = {
@@ -84,6 +84,9 @@ export async function findOffers(
     }
     if (type >= 0) {
       params.type = type
+    }
+    if (conditions.local) {
+      params.local = 1
     }
   }
   const data: {
@@ -130,7 +133,7 @@ export function reject(id: number) {
   return instance.post(`/reject/${id}`)
 }
 
-export function findOffersSameCity(start: number, end: number): Promise<{ list: Offer[], total: number }> {
+export function findAnswers(start: number, end: number): Promise<{ list: Offer[], total: number }> {
   return instance.get('/answer', {params: {start, end}})
 }
 
