@@ -59,9 +59,9 @@ async function loadPage(pageNo = 1) {
     }
 
     loadingPage.value = true
+    source.cancel()
+    source = axios.CancelToken.source()
     try {
-        source.cancel()
-        source = axios.CancelToken.source()
         data = await api.findOffers(start, end, conditions, source.token)
     } catch (e) {
         if (!axios.isCancel(e)) {
