@@ -4,6 +4,7 @@ import {validateOrReject} from 'class-validator'
 import {Offer} from '../entity/Offer'
 import {CancelToken} from 'axios/index'
 import {Answer} from '../entity/Answer'
+import {parseSign} from '../utils'
 
 export * from './district'
 
@@ -29,9 +30,7 @@ export async function nickname() {
     return instance.get<any, User>(`/user/1`).then(u => u.nickname)
   }
   const sign = localStorage.getItem('sign')!
-  const start = sign.indexOf('.') + 1
-  const base64 = sign.substring(start, sign.indexOf('.', start))
-  const payload = JSON.parse(atob(base64))
+  const payload = parseSign(sign)
   const profile = await instance.get<any, User>(`/user/${payload.id}`)
   return profile.nickname
 }
@@ -125,6 +124,11 @@ export async function getAnswer(id: number) {
   delete obj.userId
   Object.setPrototypeOf(obj, Answer.prototype)
   return obj
+}
+
+export async function publishAnswer(answer: Answer) {
+  const obj: { insertId: number } = await instance.post('/answer', answer)
+  return obj.insertId
 }
 
 export function reject(id: number) {

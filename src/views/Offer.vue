@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {reactive} from 'vue'
+import {reactive, ref} from 'vue'
 import {Offer, State as OfferState} from '../entity/Offer'
 import {State as AnswerState} from '../entity/Answer'
 import * as api from '../api'
@@ -55,6 +55,35 @@ async function onReject(i: number) {
     answer.state = AnswerState.rejected
     answers.splice(i, 1)
 }
+
+const dialogVisible = ref(false)
+let dialogAnswer = reactive(newAnswer())
+
+function newAnswer() {
+    const answer: Record<string, any> = new Answer()
+    answer.userId = 1
+    answer.offerId = offer.id
+    return answer as Answer
+}
+
+async function publishAnswer() {
+    dialogVisible.value = false
+
+    let id: number
+    try {
+        id = await api.publishAnswer(dialogAnswer)
+    } catch (e) {
+        ElMessage.error({
+            showClose: true,
+            message: (e as AxiosError).message,
+        })
+        return console.error(e)
+    }
+    const answer = dialogAnswer
+    dialogAnswer = reactive(newAnswer())
+    ;(answer as any).id = id
+    answers.push(answer)
+}
 </script>
 
 <template>
@@ -67,15 +96,22 @@ async function onReject(i: number) {
                         {{ typeLabels[offer.type] }}
                     </el-tooltip>
                     <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
-                <span
-                    class="state"
-                    :class="OfferState[offer.state]"
-                >
-                    {{ stateLabels[offer.state] }}
-                </span>
+                        <span
+                            class="state"
+                            :class="OfferState[offer.state]"
+                        >
+                            {{ stateLabels[offer.state] }}
+                        </span>
                     </el-tooltip>
                     <span class="price">{{ offer.price }}元</span>
                 </div>
+                <el-button
+                    type="primary"
+                    class="publish-btn"
+                    @click="dialogVisible = true"
+                >
+                    发布响应
+                </el-button>
             </header>
             <div class="time">
                 <span class="ctime">发布于{{ offer.ctime }}</span>
@@ -130,6 +166,32 @@ async function onReject(i: number) {
             </ul>
         </aside>
     </main>
+    <el-dialog
+        v-model="dialogVisible"
+        title="发布响应"
+    >
+        <el-form
+            :model="dialogAnswer"
+            class="publish-form"
+            label-width="80px"
+        >
+            <el-form-item label="描述">
+                <el-input
+                    v-model="dialogAnswer.desc"
+                    type="textarea"
+                    autocomplete="off"
+                />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="publishAnswer">
+              提交
+            </el-button>
+          </span>
+        </template>
+    </el-dialog>
 </template>
 
 <style scoped>
@@ -157,6 +219,10 @@ async function onReject(i: number) {
     padding: .4em;
     border-radius: var(--el-border-radius-base);
     color: #fff;
+}
+
+.publish-btn {
+    margin-left: 3em;
 }
 
 .time {

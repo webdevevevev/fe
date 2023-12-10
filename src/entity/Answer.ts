@@ -26,7 +26,7 @@ export class Answer {
 
   // 响应描述
   @MaxLength(255)
-  desc: string
+  desc = ''
 
   // 响应介绍图片等文件
   @ArrayMaxSize(20)
