@@ -14,3 +14,10 @@ export const stateLabels = [
   '已取消',
   '到期未达成',
 ]
+
+export const answerStateLabels = [
+  '待接受',
+  '同意',
+  '拒绝',
+  '取消',
+]

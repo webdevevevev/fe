@@ -4,7 +4,7 @@ import {Offer, State as OfferState} from '../entity/Offer'
 import {State as AnswerState} from '../entity/Answer'
 import * as api from '../api'
 import {ElMessage} from 'element-plus'
-import {stateLabels, typeLabels} from '../labels'
+import {answerStateLabels, stateLabels, typeLabels} from '../labels'
 import {Answer} from '../entity/Answer'
 import {Select, CloseBold} from '@element-plus/icons-vue'
 import {AxiosError} from 'axios'
@@ -31,7 +31,7 @@ async function init(offer: Offer, answers: Answer[]) {
     delete o.userId
     Object.assign(offer, o)
     const as = await Promise.all(offer.answerIds.map(id => api.getAnswer(id)))
-    answers.push(...as)
+    answers.push(...as.filter(isShowing))
     for (const answer of answers) {
         api.getPublicProfile(answer.user.id)
             .then(profile => {
@@ -47,6 +47,26 @@ init(offer, answers).catch(e => {
     })
     console.error(e)
 })
+
+const isPending = computed(() => offer.state === OfferState.pending)
+
+function isShowing({state}: Answer) {
+    return state === AnswerState.pending || state === AnswerState.accepted
+}
+
+async function onAccept(i: number) {
+    const answer = answers[i]
+    try {
+        await api.accept(answer.id, offer.id)
+    } catch (e) {
+        ElMessage.error({
+            showClose: true,
+            message: (e as AxiosError).message,
+        })
+        console.error(e)
+    }
+    answer.state = AnswerState.accepted
+}
 
 async function onReject(i: number) {
     const answer = answers[i]
@@ -153,12 +173,17 @@ async function publishAnswer() {
                             <h4 class="card-title">{{ answer.user.nickname }}</h4>
                             <el-button-group size="small" @click.stop>
                                 <el-tooltip content="接受">
-                                    <el-button :icon="Select" @click=""/>
+                                    <el-button
+                                        :icon="Select"
+                                        @click="onAccept(i)"
+                                        :disabled="!isPending || answer.state === AnswerState.accepted"
+                                    />
                                 </el-tooltip>
                                 <el-tooltip content="拒绝">
                                     <el-button
                                         class="reject-btn"
                                         @click="onReject(i)"
+                                        :disabled="!isPending || answer.state === AnswerState.accepted"
                                     >
                                         <el-icon color="red">
                                             <CloseBold/>
@@ -170,7 +195,17 @@ async function publishAnswer() {
                         <el-text :line-clamp="2" class="answer-desc">{{ answer.desc }}</el-text>
                         <template #footer>
                             <div class="card-footer">
-                                {{ answer.ctime }}
+                                <span>
+                                    {{ answer.ctime }}
+                                </span>
+                                <el-tooltip :content="`状态：${answerStateLabels[answer.state]}`">
+                                    <span
+                                        class="state"
+                                        :class="AnswerState[answer.state]"
+                                    >
+                                        {{ answerStateLabels[answer.state] }}
+                                    </span>
+                                </el-tooltip>
                             </div>
                         </template>
                     </el-card>
@@ -244,6 +279,12 @@ async function publishAnswer() {
 .time,
 .card-footer {
     color: var(--el-text-color-regular);
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .mtime {
@@ -325,7 +366,8 @@ async function publishAnswer() {
     padding-bottom: .4em;
 }
 
-.fulfilled {
+.fulfilled,
+.accepted {
     background-color: var(--el-color-success);
 }
 

@@ -129,11 +129,15 @@ export async function publishAnswer(answer: Answer) {
   return obj.insertId
 }
 
+export function accept(id: number, offerId: number) {
+  return instance.post(`/accept/${id}`, {offerId})
+}
+
 export function reject(id: number) {
   return instance.post(`/reject/${id}`)
 }
 
-export function findAnswers(start: number, end: number): Promise<{ list: Offer[], total: number }> {
+export function findAnswers(start: number, end: number): Promise<{ list: Answer[], total: number }> {
   return instance.get('/answer', {params: {start, end}})
 }
 
