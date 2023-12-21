@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {Delete, Edit} from '@element-plus/icons-vue'
 import {deleteOffer} from '../api'
 import {offerStateLabels, typeLabels} from '../labels'
 import {Offer, State as OfferState} from '../entity/Offer'
@@ -9,7 +8,6 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 import * as api from '../api'
 import axios, {AxiosError} from 'axios'
 import {useThrottleFn} from '@vueuse/core'
-import router from '../router'
 import Card from '../components/Card.vue'
 
 const pageSize = 12
@@ -145,13 +143,8 @@ const processingIdx = ref(-1)
 
 async function deleteOffer(index: number) {
     const offer = offers[index]
-    if (offer.state !== OfferState.pending) {
-        const message = '只能删除未响应的请求'
-        ElMessage.error({
-            showClose: true,
-            message,
-        })
-        return console.error(message)
+    if (!checkPending(offer, '只能删除未响应的请求')) {
+        return
     }
     try {
         await ElMessageBox.confirm('确认删除？', undefined, {
@@ -192,9 +185,24 @@ function onPublishOffer() {
 }
 
 function onEditOffer(offer: Offer) {
-    dialogVisible.value = true
-    dialogType.value = DialogType.edit
-    dialogOffer.value = offer
+    if (checkPending(offer, '只能修改未响应的请求')) {
+        dialogVisible.value = true
+        dialogType.value = DialogType.edit
+        dialogOffer.value = offer
+    }
+}
+
+function checkPending(offer: Offer, msg: string) {
+    if (offer.state !== OfferState.pending) {
+        const message = msg
+        ElMessage.error({
+            showClose: true,
+            message,
+        })
+        console.error(message)
+        return false
+    }
+    return true
 }
 </script>
 
