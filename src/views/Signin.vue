@@ -29,7 +29,9 @@ async function onSubmit() {
         store.commit('signin', {nickname: form.name, sign})
         localStorage.setItem('sign', sign)
         store.dispatch('getNickname')
-        router.push('/')
+
+        const href = store.getters.isAdmin ? '/admin' : '/'
+        router.push(href)
     } else {
         ElMessage.error({
             showClose: true,

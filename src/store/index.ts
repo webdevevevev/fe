@@ -19,6 +19,9 @@ export default createStore<{
     userId({sign}) {
       return sign ? parseSign(sign).id : undefined
     },
+    isAdmin({sign}) {
+      return sign && parseSign(sign).admin
+    },
   },
   mutations: {
     signin(state, {nickname, sign}: { nickname: string, sign: string }) {

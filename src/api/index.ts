@@ -5,6 +5,7 @@ import {Offer} from '../entity/Offer'
 import {CancelToken} from 'axios/index'
 import {Answer} from '../entity/Answer'
 import {parseSign} from '../utils'
+import {Deal} from '../entity/Deal'
 
 export * from './district'
 
@@ -143,6 +144,12 @@ export function reject(id: number) {
 
 export function findAnswers(start: number, end: number): Promise<{ list: Answer[], total: number }> {
   return instance.get('/answer', {params: {start, end}})
+}
+
+export async function getDeals() {
+  const deals: Deal[] = await instance.get('/admin/deal')
+  Object.setPrototypeOf(deals, Deal.prototype)
+  return deals
 }
 
 export default instance
