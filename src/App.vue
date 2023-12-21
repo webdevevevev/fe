@@ -30,13 +30,13 @@ if (store.state.sign) {
             <template #dropdown>
                 <el-dropdown-menu class="dropdown-menu">
                     <el-dropdown-item>
-                        <router-link to="profile">
+                        <router-link to="/profile">
                             账号设置
                         </router-link>
                     </el-dropdown-item>
                     <el-dropdown-item divided>
                         <router-link
-                            to="welcome"
+                            to="/welcome"
                             @click="store.commit('removeSign')"
                         >
                             退出
