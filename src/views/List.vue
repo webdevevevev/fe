@@ -425,20 +425,4 @@ function checkPending(offer: Offer, msg: string) {
     border-radius: var(--el-border-radius-base);
     color: #fff;
 }
-
-.fulfilled {
-    background-color: var(--el-color-success);
-}
-
-.pending {
-    background-color: var(--el-color-primary);
-}
-
-.canceled {
-    background-color: var(--el-color-warning);
-}
-
-.expired {
-    background-color: var(--el-color-info);
-}
 </style>
