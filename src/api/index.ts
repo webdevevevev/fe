@@ -129,6 +129,10 @@ export async function publishAnswer(answer: Answer) {
   return obj.insertId
 }
 
+export function updateAnswer(answer: Answer) {
+  return instance.put(`/answer/${answer.id}`, answer)
+}
+
 export function accept(id: number) {
   return instance.post(`/accept/${id}`)
 }

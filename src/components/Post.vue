@@ -30,11 +30,16 @@ const State = props.base instanceof Offer
 
 const btnDisabled = computed(() => props.base.state === AnswerState.accepted)
 
+const isOwn = computed(() => props.base.user?.id === store.getters.userId)
+
 const dialogVisible = ref(false)
-let dialogAnswer = reactive(newAnswer())
+let dialogAnswer = reactive(
+    props.base instanceof Offer
+        ? newAnswer()
+        : props.base,
+)
 const publishDisabled = computed(() => {
-    return props.base.user?.id === store.getters.userId
-        || props.base.state !== State.pending
+    return isOwn.value || props.base.state !== State.pending
 })
 
 function newAnswer() {
@@ -44,6 +49,26 @@ function newAnswer() {
     answer.offer = new Offer()
     answer.offer.id = answer.offerId
     return answer as Answer
+}
+
+function submitDialog() {
+    return isOwn
+        ? updateAnswer(props.base as Answer)
+        : publishAnswer()
+}
+
+function updateAnswer(answer: Answer) {
+    dialogVisible.value = false
+
+    try {
+        return api.updateAnswer(answer)
+    } catch (e) {
+        ElMessage.error({
+            showClose: true,
+            message: (e as AxiosError).message,
+        })
+        return console.error(e)
+    }
 }
 
 async function publishAnswer() {
@@ -126,6 +151,14 @@ async function onReject() {
             >
                 发布响应
             </el-button>
+            <el-button
+                v-else-if="isOwn"
+                type="primary"
+                class="action-btn"
+                @click="dialogVisible = true"
+            >
+                修改响应
+            </el-button>
             <el-button-group
                 v-else
                 size="small"
@@ -166,7 +199,7 @@ async function onReject() {
         </p>
         <el-dialog
             v-model="dialogVisible"
-            title="发布响应"
+            :title="`${isOwn ? '修改' : '发布'}响应`"
         >
             <el-form
                 :model="dialogAnswer"
@@ -184,7 +217,7 @@ async function onReject() {
             <template #footer>
           <span class="dialog-footer">
             <el-button @click="dialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="publishAnswer">
+            <el-button type="primary" @click="submitDialog">
               提交
             </el-button>
           </span>
