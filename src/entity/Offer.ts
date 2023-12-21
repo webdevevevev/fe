@@ -17,7 +17,7 @@ export const enum Type {
   other,
 }
 
-export const enum State {
+export enum State {
   // 已完成
   fulfilled,
   // 待响应

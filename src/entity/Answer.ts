@@ -2,7 +2,7 @@ import {User} from './User'
 import {Offer} from './Offer'
 import {ArrayMaxSize, IsInt, Max, MaxLength, Min} from 'class-validator'
 
-export const enum State {
+export enum State {
   // 待接受
   pending,
   // 同意

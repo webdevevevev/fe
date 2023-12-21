@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import {computed, reactive} from 'vue'
+import {reactive} from 'vue'
 import {Offer, State as OfferState} from '../entity/Offer'
 import {State as AnswerState} from '../entity/Answer'
 import * as api from '../api'
 import {ElMessage} from 'element-plus'
-import {answerStateLabels} from '../labels'
 import {Answer} from '../entity/Answer'
-import {Select, CloseBold} from '@element-plus/icons-vue'
 import {AxiosError} from 'axios'
 import {User} from '../entity/User'
 import Post from '../components/Post.vue'
 import {useRouter} from 'vue-router'
+import Card from '../components/Card.vue'
+import {answerStateLabels} from '../labels'
+import {useDateFormat} from '@vueuse/core'
 
 const props = defineProps({
     id: {
@@ -49,8 +50,6 @@ init(offer, answers).catch(e => {
     console.error(e)
 })
 
-const isPending = computed(() => offer.state === OfferState.pending)
-
 function isShowing({state}: Answer) {
     return state === AnswerState.pending || state === AnswerState.accepted
 }
@@ -71,6 +70,7 @@ async function onAccept(i: number) {
         console.error(e)
     }
     answer.state = AnswerState.accepted
+    offer.state = OfferState.fulfilled
 }
 
 async function onReject(i: number) {
@@ -104,50 +104,26 @@ async function onReject(i: number) {
                     :key="answer.id"
                     class="answer-preview"
                 >
-                    <el-card
+                    <Card
+                        :base="answer"
+                        @accept="onAccept(i)"
+                        @reject="onReject(i)"
                         shadow="hover"
-                        @click="router.push(`/answer/${answer.id}`)"
                     >
-                        <template #header>
-                            <h4 class="card-title">{{ answer.user.nickname }}</h4>
-                            <el-button-group size="small" @click.stop>
-                                <el-tooltip content="接受">
-                                    <el-button
-                                        :icon="Select"
-                                        @click="onAccept(i)"
-                                        :disabled="!isPending || answer.state === AnswerState.accepted"
-                                    />
-                                </el-tooltip>
-                                <el-tooltip content="拒绝">
-                                    <el-button
-                                        class="reject-btn"
-                                        @click="onReject(i)"
-                                        :disabled="!isPending || answer.state === AnswerState.accepted"
-                                    >
-                                        <el-icon color="red">
-                                            <CloseBold/>
-                                        </el-icon>
-                                    </el-button>
-                                </el-tooltip>
-                            </el-button-group>
-                        </template>
-                        <el-text :line-clamp="2" class="answer-desc">{{ answer.desc }}</el-text>
                         <template #footer>
-                            <div class="card-footer">
-                                <span>
-                                    {{ answer.ctime }}
+                            <span>
+                                {{ useDateFormat(answer.ctime, 'YYYY-MM-DD HH:mm').value }}
+                            </span>
+                            <el-tooltip :content="`状态：${answerStateLabels[answer.state]}`">
+                                <span
+                                    class="state"
+                                    :class="AnswerState[answer.state]"
+                                >
+                                    {{ answerStateLabels[answer.state] }}
                                 </span>
-                                <el-tooltip :content="`状态：${answerStateLabels[answer.state]}`">
-                                    <span
-                                        class="state"
-                                        :class="AnswerState[answer.state]"
-                                    >
-                                        {{ answerStateLabels[answer.state] }}
-                                    </span>
-                                </el-tooltip>
-                            </div>
+                            </el-tooltip>
                         </template>
-                    </el-card>
+                    </Card>
                 </li>
             </ul>
             <el-empty
@@ -169,19 +145,6 @@ async function onReject(i: number) {
     height: calc(100vh - 2em - 3.2em - 2em);
     overflow-y: auto;
     padding: 0 2em 0 3em;
-}
-
-.state {
-    padding: .4em;
-    border-radius: var(--el-border-radius-base);
-    color: #fff;
-}
-
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--el-text-color-regular);
 }
 
 .aside {
@@ -209,43 +172,10 @@ async function onReject(i: number) {
     transition: transform .2s;
 }
 
-:deep(.el-card__header) {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 700;
-    padding-top: 1em;
-    padding-bottom: 1em;
-
-    background-color: var(--el-color-primary-dark-2);
+.state {
+    padding: .4em;
+    border-radius: var(--el-border-radius-base);
     color: #fff;
-}
-
-.card-title {
-    flex: 1;
-    margin-right: 1em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.reject-btn:hover {
-    background-color: var(--el-color-danger-light-7);
-    border-color: var(--el-color-danger-light-3);
-}
-
-.reject-btn:active {
-    background-color: var(--el-color-danger-light-3);
-    border-color: var(--el-color-danger);
-}
-
-.answer-desc {
-    height: 3em;
-}
-
-:deep(.el-card__footer) {
-    padding-top: 0;
-    padding-bottom: .4em;
 }
 
 .fulfilled,

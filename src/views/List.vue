@@ -10,6 +10,7 @@ import * as api from '../api'
 import axios, {AxiosError} from 'axios'
 import {useThrottleFn} from '@vueuse/core'
 import router from '../router'
+import Card from '../components/Card.vue'
 
 const pageSize = 12
 
@@ -246,60 +247,36 @@ function onEditOffer(offer: Offer) {
             v-for="(offer, i) in offers"
             :key="offer.id"
         >
-            <el-card
+            <Card
+                :base="offer"
                 shadow="always"
                 v-loading="processingIdx === i"
-                @click="router.push(`offer/${offer.id}`)"
+                @edit-offer="onEditOffer"
+                @delete-offer="deleteOffer(i)"
             >
-                <template #header>
-                    <h3 class="card-title">{{ offer.title }}</h3>
-                    <el-button-group
-                        v-if="selectedMenu === Menu.offer"
-                        size="small"
-                        @click.stop
-                    >
-                        <el-tooltip content="删除">
-                            <el-button
-                                class="delete-btn"
-                                @click="deleteOffer(i)"
-                            >
-                                <el-icon color="red">
-                                    <Delete/>
-                                </el-icon>
-                            </el-button>
-                        </el-tooltip>
-                        <el-tooltip content="编辑">
-                            <el-button :icon="Edit" @click="onEditOffer(offer)"/>
-                        </el-tooltip>
-                    </el-button-group>
-                </template>
-                <el-text :line-clamp="2" class="desc">{{ offer.desc }}</el-text>
-                <div class="card-footer">
+                <template #footer>
                     <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
                         {{ typeLabels[offer.type] }}
                     </el-tooltip>
                     <el-tooltip :content="`状态：${offerStateLabels[offer.state]}`">
                         <el-badge
-                            :value="offer.answerIds.length"
                             v-if="offer.state === OfferState.pending"
-                        >
-                            <span
-                                class="offer-state"
-                                :class="OfferState[offer.state]"
-                            >
-                                {{ offerStateLabels[offer.state] }}
-                            </span>
-                        </el-badge>
-                        <span
+                            :value="offer.answerIds.length"
                             class="offer-state"
                             :class="OfferState[offer.state]"
+                        >
+                            {{ offerStateLabels[offer.state] }}
+                        </el-badge>
+                        <span
                             v-else
+                            class="offer-state"
+                            :class="OfferState[offer.state]"
                         >
                             {{ offerStateLabels[offer.state] }}
                         </span>
                     </el-tooltip>
-                </div>
-            </el-card>
+                </template>
+            </Card>
         </li>
     </ul>
     <el-empty v-else description="列表为空"/>
@@ -413,48 +390,10 @@ function onEditOffer(offer: Offer) {
     transition: transform .2s;
 }
 
-:deep(.el-card__header) {
+:deep(.el-card__footer) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-weight: 700;
-    padding-top: 1em;
-    padding-bottom: 1em;
-
-    background-color: var(--el-color-primary-dark-2);
-    color: #fff;
-}
-
-.card-title {
-    flex: 1;
-    margin-right: 1em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.delete-btn:hover {
-    background-color: var(--el-color-danger-light-7);
-    border-color: var(--el-color-danger-light-3);
-}
-
-.delete-btn:active {
-    background-color: var(--el-color-danger-light-3);
-    border-color: var(--el-color-danger);
-}
-
-.desc {
-    height: 3em;
-}
-
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: .6em;
-    padding-top: .4em;
-    height: 2em;
-    border-top: 1px solid #ccc;
 }
 
 .pagination {

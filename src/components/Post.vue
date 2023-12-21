@@ -24,13 +24,17 @@ const stateLabels = props.base instanceof Offer
     ? offerStateLabels
     : answerStateLabels
 
+const State = props.base instanceof Offer
+    ? OfferState
+    : AnswerState
+
 const btnDisabled = computed(() => props.base.state === AnswerState.accepted)
 
 const dialogVisible = ref(false)
 let dialogAnswer = reactive(newAnswer())
 const publishDisabled = computed(() => {
     return props.base.user?.id === store.getters.userId
-        || props.base.state !== OfferState.pending
+        || props.base.state !== State.pending
 })
 
 function newAnswer() {
@@ -104,12 +108,12 @@ async function onReject() {
                     {{ typeLabels[base.type] }}
                 </el-tooltip>
                 <el-tooltip :content="`状态：${stateLabels[base.state]}`">
-                        <span
-                            class="state"
-                            :class="OfferState[base.state]"
-                        >
-                            {{ stateLabels[base.state] }}
-                        </span>
+                    <span
+                        class="state"
+                        :class="State[base.state]"
+                    >
+                        {{ stateLabels[base.state] }}
+                    </span>
                 </el-tooltip>
                 <span class="price">{{ base?.price }}元</span>
             </div>
