@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, reactive, ref} from 'vue'
+import {computed, reactive} from 'vue'
 import {Offer, State as OfferState} from '../entity/Offer'
 import {State as AnswerState} from '../entity/Answer'
 import * as api from '../api'
@@ -10,6 +10,7 @@ import {Select, CloseBold} from '@element-plus/icons-vue'
 import {AxiosError} from 'axios'
 import {User} from '../entity/User'
 import Post from '../components/Post.vue'
+import {useRouter} from 'vue-router'
 
 const props = defineProps({
     id: {
@@ -17,6 +18,8 @@ const props = defineProps({
         required: true,
     },
 })
+
+const router = useRouter()
 
 const offer = reactive(new Offer())
 ;(offer as any).id = Number(props.id)
@@ -59,7 +62,7 @@ function publishAnswer(answer: Answer) {
 async function onAccept(i: number) {
     const answer = answers[i]
     try {
-        await api.accept(answer.id, offer.id)
+        await api.accept(answer.id)
     } catch (e) {
         ElMessage.error({
             showClose: true,
@@ -91,6 +94,7 @@ async function onReject(i: number) {
         <Post
             :base="offer"
             @publish="publishAnswer"
+            class="article"
         />
         <aside class="aside">
             <h3 class="aside-header">欢迎来列表</h3>
@@ -102,6 +106,7 @@ async function onReject(i: number) {
                 >
                     <el-card
                         shadow="hover"
+                        @click="router.push(`/answer/${answer.id}`)"
                     >
                         <template #header>
                             <h4 class="card-title">{{ answer.user.nickname }}</h4>
@@ -152,7 +157,13 @@ async function onReject(i: number) {
 <style scoped>
 .main {
     display: flex;
-    padding-left: 3em;
+}
+
+.article {
+    flex: 1;
+    height: calc(100vh - 2em - 3.2em - 2em);
+    overflow-y: auto;
+    padding: 0 2em 0 3em;
 }
 
 .state {

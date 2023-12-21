@@ -129,8 +129,8 @@ export async function publishAnswer(answer: Answer) {
   return obj.insertId
 }
 
-export function accept(id: number, offerId: number) {
-  return instance.post(`/accept/${id}`, {offerId})
+export function accept(id: number) {
+  return instance.post(`/accept/${id}`)
 }
 
 export function reject(id: number) {
