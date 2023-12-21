@@ -4,14 +4,12 @@ import {Offer, State as OfferState} from '../entity/Offer'
 import {State as AnswerState} from '../entity/Answer'
 import * as api from '../api'
 import {ElMessage} from 'element-plus'
-import {answerStateLabels, offerStateLabels, typeLabels} from '../labels'
+import {answerStateLabels} from '../labels'
 import {Answer} from '../entity/Answer'
 import {Select, CloseBold} from '@element-plus/icons-vue'
 import {AxiosError} from 'axios'
-import {useStore} from 'vuex'
 import {User} from '../entity/User'
-
-const store = useStore()
+import Post from '../components/Post.vue'
 
 const props = defineProps({
     id: {
@@ -54,6 +52,10 @@ function isShowing({state}: Answer) {
     return state === AnswerState.pending || state === AnswerState.accepted
 }
 
+function publishAnswer(answer: Answer) {
+    answers.push(answer)
+}
+
 async function onAccept(i: number) {
     const answer = answers[i]
     try {
@@ -82,82 +84,14 @@ async function onReject(i: number) {
     answer.state = AnswerState.rejected
     answers.splice(i, 1)
 }
-
-const dialogVisible = ref(false)
-let dialogAnswer = reactive(newAnswer())
-const publishDisabled = computed(() => {
-    return offer.user?.id === store.getters.userId
-        || offer.state !== OfferState.pending
-})
-
-function newAnswer() {
-    const answer: Record<string, any> = new Answer()
-    answer.userId = store.getters.userId
-    answer.offerId = offer.id
-    return answer as Answer
-}
-
-async function publishAnswer() {
-    dialogVisible.value = false
-
-    let id: number
-    try {
-        id = await api.publishAnswer(dialogAnswer)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        return console.error(e)
-    }
-    const answer = dialogAnswer
-    dialogAnswer = reactive(newAnswer())
-    ;(answer as any).id = id
-    answers.push(answer)
-}
 </script>
 
 <template>
     <main class="main">
-        <article class="article">
-            <header class="header">
-                <h2 class="title">{{ offer.title }}</h2>
-                <div class="spans">
-                    <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
-                        {{ typeLabels[offer.type] }}
-                    </el-tooltip>
-                    <el-tooltip :content="`状态：${offerStateLabels[offer.state]}`">
-                        <span
-                            class="state"
-                            :class="OfferState[offer.state]"
-                        >
-                            {{ offerStateLabels[offer.state] }}
-                        </span>
-                    </el-tooltip>
-                    <span class="price">{{ offer.price }}元</span>
-                </div>
-                <el-button
-                    type="primary"
-                    class="publish-btn"
-                    :disabled="publishDisabled"
-                    @click="dialogVisible = true"
-                >
-                    发布响应
-                </el-button>
-            </header>
-            <div class="time">
-                <span class="ctime">发布于{{ offer.ctime }}</span>
-                <span class="mtime">修改于{{ offer.mtime }}</span>
-                <p class="expire">过期于{{ offer.expire }}</p>
-            </div>
-            <p class="desc">{{ offer.desc }}</p>
-            <p
-                v-for="file in offer.files"
-                :key="file"
-            >
-                {{ file }}
-            </p>
-        </article>
+        <Post
+            :base="offer"
+            @publish="publishAnswer"
+        />
         <aside class="aside">
             <h3 class="aside-header">欢迎来列表</h3>
             <ul class="list">
@@ -213,32 +147,6 @@ async function publishAnswer() {
             </ul>
         </aside>
     </main>
-    <el-dialog
-        v-model="dialogVisible"
-        title="发布响应"
-    >
-        <el-form
-            :model="dialogAnswer"
-            class="publish-form"
-            label-width="80px"
-        >
-            <el-form-item label="描述">
-                <el-input
-                    v-model="dialogAnswer.desc"
-                    type="textarea"
-                    autocomplete="off"
-                />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="dialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="publishAnswer">
-              提交
-            </el-button>
-          </span>
-        </template>
-    </el-dialog>
 </template>
 
 <style scoped>
@@ -247,59 +155,17 @@ async function publishAnswer() {
     padding-left: 3em;
 }
 
-.header {
-    display: flex;
-    height: 2em;
-}
-
-.title {
-    flex: 1;
-}
-
-.spans {
-    display: flex;
-    align-items: center;
-    gap: 1em;
-}
-
 .state {
     padding: .4em;
     border-radius: var(--el-border-radius-base);
     color: #fff;
 }
 
-.publish-btn {
-    margin-left: 3em;
-}
-
-.time {
-    margin-top: 1em;
-}
-
-.time,
-.card-footer {
-    color: var(--el-text-color-regular);
-}
-
 .card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.mtime {
-    margin-left: 1em;
-}
-
-.article {
-    flex: 1;
-    height: calc(100vh - 2em - 3.2em - 2em);
-    padding-right: 2em;
-    overflow-y: auto;
-}
-
-.desc {
-    margin-bottom: 1em;
+    color: var(--el-text-color-regular);
 }
 
 .aside {
