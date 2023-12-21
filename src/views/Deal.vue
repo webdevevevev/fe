@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {ref} from 'vue'
-import {TableV2SortOrder} from 'element-plus'
 import type {SortBy, SortState} from 'element-plus'
+import {TableV2SortOrder} from 'element-plus'
 import * as api from '../api'
 import {Deal} from '../entity/Deal'
+import {SortOrder} from 'element-plus/es/components/table-v2/src/constants'
 
 const width = 200
 const columns = [{
@@ -32,7 +33,7 @@ const columns = [{
     dataKey: 'price',
     title: '中介费',
     width,
-    sortable: true,
+    // sortable: true,
 }]
 
 const deals = ref<Deal[]>([])
@@ -41,6 +42,10 @@ api.getDeals().then(data => {
         deal.price = deal.offerPrice + deal.answerPrice
     }
     deals.value = data
+    onSort({
+        key: 'time',
+        order: SortOrder.DESC,
+    })
 })
 
 const sortState = ref<SortState>({
@@ -50,7 +55,13 @@ const sortState = ref<SortState>({
 
 const onSort = ({key, order}: SortBy) => {
     sortState.value[key] = order
-    deals.value = deals.value.reverse()
+    const ascCmp = key === 'time'
+        ? (a, b) => a.time.localeCompare(b.time)
+        : (a, b) => a - b
+    const cmp = order === SortOrder.ASC
+        ? ascCmp
+        : (a, b) => ascCmp(b, a)
+    deals.value.sort(cmp)
 }
 </script>
 
@@ -59,13 +70,16 @@ const onSort = ({key, order}: SortBy) => {
         v-model:sort-state="sortState"
         :columns="columns"
         :data="deals"
-        :width="700"
-        :height="400"
+        :width="width * 5"
+        :height="600"
         fixed
         @column-sort="onSort"
+        class="list"
     />
 </template>
 
 <style scoped>
-
+.list {
+    margin: 0 auto;
+}
 </style>

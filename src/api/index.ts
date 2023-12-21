@@ -148,7 +148,9 @@ export function findAnswers(start: number, end: number): Promise<{ list: Answer[
 
 export async function getDeals() {
   const deals: Deal[] = await instance.get('/admin/deal')
-  Object.setPrototypeOf(deals, Deal.prototype)
+  for (const deal of deals) {
+    Object.setPrototypeOf(deal, Deal.prototype)
+  }
   return deals
 }
 
