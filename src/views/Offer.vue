@@ -98,7 +98,7 @@ async function onReject(i: number) {
         />
         <aside class="aside">
             <h3 class="aside-header">欢迎来列表</h3>
-            <ul class="list">
+            <ul v-if="answers.length" class="list">
                 <li
                     v-for="(answer, i) of answers"
                     :key="answer.id"
@@ -150,6 +150,11 @@ async function onReject(i: number) {
                     </el-card>
                 </li>
             </ul>
+            <el-empty
+                v-else
+                description="列表为空"
+                :image-size="100"
+            />
         </aside>
     </main>
 </template>

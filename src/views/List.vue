@@ -240,7 +240,7 @@ function onEditOffer(offer: Offer) {
             </li>
         </ul>
     </div>
-    <ul class="list" v-loading="loadingPage">
+    <ul v-if="offers.length" class="list" v-loading="loadingPage">
         <li
             class="offer-preview"
             v-for="(offer, i) in offers"
@@ -302,6 +302,7 @@ function onEditOffer(offer: Offer) {
             </el-card>
         </li>
     </ul>
+    <el-empty v-else description="列表为空"/>
     <el-pagination
         class="pagination"
         @current-change="loadPage"
