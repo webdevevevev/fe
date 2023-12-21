@@ -8,7 +8,7 @@ export const typeLabels = [
   '其他',
 ]
 
-export const stateLabels = [
+export const offerStateLabels = [
   '已完成',
   '待响应',
   '已取消',

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {Delete, Edit} from '@element-plus/icons-vue'
 import {deleteOffer} from '../api'
-import {stateLabels, typeLabels} from '../labels'
+import {offerStateLabels, typeLabels} from '../labels'
 import {Offer, State as OfferState} from '../entity/Offer'
 import OfferTypeSelect from '../components/OfferTypeSelect.vue'
-import {computed, onMounted, reactive, ref} from 'vue'
+import {onMounted, reactive, ref} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import * as api from '../api'
 import axios, {AxiosError} from 'axios'
@@ -278,7 +278,7 @@ function onEditOffer(offer: Offer) {
                     <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
                         {{ typeLabels[offer.type] }}
                     </el-tooltip>
-                    <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
+                    <el-tooltip :content="`状态：${offerStateLabels[offer.state]}`">
                         <el-badge
                             :value="offer.answerIds.length"
                             v-if="offer.state === OfferState.pending"
@@ -287,7 +287,7 @@ function onEditOffer(offer: Offer) {
                                 class="offer-state"
                                 :class="OfferState[offer.state]"
                             >
-                                {{ stateLabels[offer.state] }}
+                                {{ offerStateLabels[offer.state] }}
                             </span>
                         </el-badge>
                         <span
@@ -295,7 +295,7 @@ function onEditOffer(offer: Offer) {
                             :class="OfferState[offer.state]"
                             v-else
                         >
-                            {{ stateLabels[offer.state] }}
+                            {{ offerStateLabels[offer.state] }}
                         </span>
                     </el-tooltip>
                 </div>

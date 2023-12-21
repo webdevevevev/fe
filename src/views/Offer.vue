@@ -4,7 +4,7 @@ import {Offer, State as OfferState} from '../entity/Offer'
 import {State as AnswerState} from '../entity/Answer'
 import * as api from '../api'
 import {ElMessage} from 'element-plus'
-import {answerStateLabels, stateLabels, typeLabels} from '../labels'
+import {answerStateLabels, offerStateLabels, typeLabels} from '../labels'
 import {Answer} from '../entity/Answer'
 import {Select, CloseBold} from '@element-plus/icons-vue'
 import {AxiosError} from 'axios'
@@ -126,12 +126,12 @@ async function publishAnswer() {
                     <el-tooltip :content="`类型：${typeLabels[offer.type]}`">
                         {{ typeLabels[offer.type] }}
                     </el-tooltip>
-                    <el-tooltip :content="`状态：${stateLabels[offer.state]}`">
+                    <el-tooltip :content="`状态：${offerStateLabels[offer.state]}`">
                         <span
                             class="state"
                             :class="OfferState[offer.state]"
                         >
-                            {{ stateLabels[offer.state] }}
+                            {{ offerStateLabels[offer.state] }}
                         </span>
                     </el-tooltip>
                     <span class="price">{{ offer.price }}元</span>
