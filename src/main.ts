@@ -6,6 +6,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import store from './store'
 import router from './router'
 import './style.css'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
 const app = createApp(App)
 
@@ -16,5 +17,5 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app
   .use(router)
   .use(store)
-  .use(ElementPlus)
+  .use(ElementPlus, {locale: zhCn})
   .mount('#app')

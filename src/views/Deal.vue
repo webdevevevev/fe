@@ -166,8 +166,9 @@ const chartDom = ref(null)
 const option: ECBasicOption = {
     tooltip: {
         trigger: 'axis',
-        position(pt: unknown[]) {
-            return [pt[0], '10%']
+        position(pointerPos: any[]) {
+            pointerPos[1] = '10%'
+            return pointerPos
         },
     },
     title: {
@@ -176,16 +177,7 @@ const option: ECBasicOption = {
     },
     toolbox: {
         feature: {
-            dataZoom: {
-                yAxisIndex: 'none',
-                title: {
-                    zoom: '缩放',
-                    back: '还原',
-                },
-            },
-            restore: {
-                title: '恢复',
-            },
+            restore: {},
         },
     },
     legend: {
@@ -228,7 +220,7 @@ const option: ECBasicOption = {
 }
 let myChart: echarts.ECharts
 onMounted(() => {
-    myChart = echarts.init(chartDom.value)
+    myChart = echarts.init(chartDom.value, null, {locale: 'ZH'})
 })
 </script>
 
