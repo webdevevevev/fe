@@ -5,16 +5,37 @@ import {TableV2SortOrder} from 'element-plus'
 import * as api from '../api'
 import {Deal} from '../entity/Deal'
 import {SortOrder} from 'element-plus/es/components/table-v2/src/constants'
+import CitySelect from '../components/CitySelect.vue'
 
 const conditions = reactive<{
+    province: number
     city: number
-    start?: Date
-    end?: Date
+    monthRange: Date[]
 }>({
-    city: 100000,
-    start: undefined,
-    end: undefined,
+    province: -1,
+    city: -1,
+    monthRange: [],
 })
+
+const shortcuts = [{
+    text: '本月',
+    value: [new Date(), new Date()],
+}, {
+    text: '本年',
+    value() {
+        const end = new Date()
+        const start = new Date(new Date().getFullYear(), 0)
+        return [start, end]
+    },
+}, {
+    text: '过去6个月',
+    value() {
+        const end = new Date()
+        const start = new Date()
+        start.setMonth(start.getMonth() - 6)
+        return [start, end]
+    },
+}]
 
 const width = 200
 const columns = [{
@@ -49,7 +70,11 @@ const columns = [{
 const deals = ref<Deal[]>([])
 
 function load() {
-    api.getDeals(conditions.city, conditions.start?.getTime(), conditions.end?.getTime())
+    api.getDeals(
+        conditions.city,
+        conditions.monthRange[0]?.getTime(),
+        conditions.monthRange[1]?.getTime()
+    )
         .then(data => {
             for (const deal of data) {
                 deal.price = deal.offerPrice + deal.answerPrice
@@ -89,18 +114,19 @@ const onSort = ({key, order}: SortBy) => {
         <el-form class="toolbar">
             <el-form-item class="tool">
                 <el-date-picker
-                    v-model="conditions.start"
-                    type="date"
-                    placeholder="起始日期"
-                    format="YYYY/MM/DD"
+                    v-model="conditions.monthRange"
+                    type="monthrange"
+                    unlink-panels
+                    range-separator="至"
+                    start-placeholder="起始月份"
+                    end-placeholder="终止月份"
+                    :shortcuts="shortcuts"
                 />
             </el-form-item>
             <el-form-item class="tool">
-                <el-date-picker
-                    v-model="conditions.end"
-                    type="date"
-                    placeholder="终止日期"
-                    format="YYYY/MM/DD"
+                <CitySelect
+                    v-model:province="conditions.province"
+                    v-model:city="conditions.city"
                 />
             </el-form-item>
             <el-form-item class="tool">
