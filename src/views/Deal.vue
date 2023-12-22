@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import {reactive, ref} from 'vue'
-import {SortBy, SortState, TableV2SortOrder, Column} from 'element-plus'
+import {onMounted, reactive, ref} from 'vue'
+import {Column, SortBy, SortState, TableV2SortOrder} from 'element-plus'
 import * as api from '../api'
 import {Deal} from '../entity/Deal'
 import {SortOrder} from 'element-plus/es/components/table-v2/src/constants'
 import CitySelect from '../components/CitySelect.vue'
+import * as echarts from 'echarts'
+import type {ECBasicOption} from 'echarts/types/src/util/types'
 
 const conditions = reactive<{
     province: number
@@ -78,17 +80,16 @@ function load() {
         conditions.city,
         conditions.monthRange[0]?.getTime(),
         conditions.monthRange[1]?.getTime(),
-    )
-        .then(data => {
-            for (const deal of data) {
-                deal.price = deal.offerPrice + deal.answerPrice
-            }
-            deals.value = data
-            onSort({
-                key: 'time',
-                order: SortOrder.DESC,
-            })
+    ).then(data => {
+        for (const deal of data) {
+            deal.price = deal.offerPrice + deal.answerPrice
+        }
+        deals.value = data
+        onSort({
+            key: 'time',
+            order: SortOrder.DESC,
         })
+    })
 }
 
 load()
@@ -107,7 +108,128 @@ const onSort = ({key, order}: SortBy) => {
         ? ascCmp
         : (a, b) => ascCmp(b, a)
     deals.value.sort(cmp)
+    updateChart(deals.value, order)
 }
+
+function updateChart(deals: ReadonlyArray<Deal>, order: SortOrder) {
+    if (deals.length <= 0) {
+        return []
+    }
+    const dealsASC = order === SortOrder.ASC ? deals : [...deals].reverse()
+    const {x, price, count} = ChartDataASC(dealsASC)
+    option.series[0].data = count.map((n, i) => [x[i], n])
+    option.series[1].data = price.map((n, i) => [x[i], n])
+    myChart.setOption(option)
+}
+
+function ChartDataASC(deals: ReadonlyArray<Deal>) {
+    const minDate = new Date(deals[0].time)
+    let year = minDate.getFullYear()
+    let month = minDate.getMonth()
+    const x = [new Date(year, month).getTime()]
+    const price: number[] = [deals[0].price]
+    const count = [1]
+    for (let i = 1; i < deals.length; i++) {
+        const deal = deals[i]
+        const time = new Date(deal.time)
+        const timeMonth = time.getMonth()
+        const timeYear = time.getFullYear()
+        if (timeYear === year && timeMonth === month) {
+            price[price.length - 1] += deal.price
+            count[count.length - 1]++
+        } else {
+            price.push(deal.price)
+            count.push(1)
+            const [nextYear, nextMonth] = timeMonth >= 12
+                ? [timeYear + 1, 0]
+                : [timeYear, month + 1]
+            x.push(new Date(timeYear, timeMonth).getTime())
+            year = nextYear
+            month = nextMonth
+        }
+    }
+    return {x, price, count}
+}
+
+let base = new Date(1988, 9, 3).getTime()
+const oneMonth = 30 * 24 * 3600 * 1000
+
+const data = [[base, Math.random() * 300]]
+
+for (let i = 1; i < 666; i++) {
+    base += oneMonth
+    const now = new Date(base)
+    data.push([now.getTime(), Math.round((Math.random() - 0.5) * 20 + data[i - 1][1])])
+}
+
+const chartDom = ref(null)
+const option: ECBasicOption = {
+    tooltip: {
+        trigger: 'axis',
+        position(pt: unknown[]) {
+            return [pt[0], '10%']
+        },
+    },
+    title: {
+        text: '成交单数及中介费金额图',
+        left: 'center',
+    },
+    toolbox: {
+        feature: {
+            dataZoom: {
+                yAxisIndex: 'none',
+                title: {
+                    zoom: '缩放',
+                    back: '还原',
+                },
+            },
+            restore: {
+                title: '恢复',
+            },
+        },
+    },
+    legend: {
+        data: ['成交单数', '中介费'],
+        left: 10,
+    },
+    xAxis: {
+        type: 'time',
+        boundaryGap: false,
+    },
+    yAxis: [{
+        name: '成交单数',
+        type: 'value',
+        boundaryGap: [0, '100%'],
+    }, {
+        name: '中介费（元）',
+        nameLocation: 'end',
+        alignTicks: true,
+        type: 'value',
+    }],
+    dataZoom: [{
+        type: 'inside',
+        start: 0,
+        end: 100,
+    }, {
+        start: 0,
+        end: 20,
+    }],
+    series: [{
+        name: '成交单数',
+        type: 'line',
+        symbol: 'none',
+        yAxisIndex: 0,
+    }, {
+        name: '中介费',
+        type: 'line',
+        symbol: 'none',
+        yAxisIndex: 1,
+    }],
+}
+let myChart: echarts.ECharts
+onMounted(() => {
+    myChart = echarts.init(chartDom.value)
+})
 </script>
 
 <template>
@@ -155,18 +277,22 @@ const onSort = ({key, order}: SortBy) => {
         @column-sort="onSort"
         class="list"
     />
+
+    <div ref="chartDom" class="chart"></div>
 </template>
 
 <style scoped>
 .header {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
     margin: 0 16em;
     border-bottom: var(--el-border);
 }
 
 .toolbar {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .tool {
@@ -175,5 +301,19 @@ const onSort = ({key, order}: SortBy) => {
 
 .list {
     margin: 0 auto;
+
+    &:hover {
+        box-shadow: var(--el-box-shadow-light);
+    }
+}
+
+.chart {
+    width: 800px;
+    height: 600px;
+    margin: 6em auto;
+
+    &:hover {
+        box-shadow: var(--el-box-shadow-light);
+    }
 }
 </style>
