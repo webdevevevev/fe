@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {reactive, ref} from 'vue'
-import {SortBy, SortState} from 'element-plus'
-import {TableV2SortOrder} from 'element-plus'
+import {SortBy, SortState, TableV2SortOrder, Column} from 'element-plus'
 import * as api from '../api'
 import {Deal} from '../entity/Deal'
 import {SortOrder} from 'element-plus/es/components/table-v2/src/constants'
@@ -38,33 +37,38 @@ const shortcuts = [{
 }]
 
 const width = 200
-const columns = [{
+const columns: Column[] = [{
     key: 'time',
     dataKey: 'time',
     title: '达成日期',
     width,
     sortable: true,
+    align: 'center',
 }, {
     key: 'offerId',
     dataKey: 'offerId',
     title: '请求标识',
     width,
+    align: 'center',
 }, {
     key: 'offerPrice',
     dataKey: 'offerPrice',
     title: '发布者支付中介费',
     width,
+    align: 'center',
 }, {
     key: 'answerPrice',
     dataKey: 'answerPrice',
     title: '响应者支付中介费',
     width,
+    align: 'center',
 }, {
     key: 'price',
     dataKey: 'price',
     title: '中介费',
     width,
     // sortable: true,
+    align: 'center',
 }]
 
 const deals = ref<Deal[]>([])
@@ -73,7 +77,7 @@ function load() {
     api.getDeals(
         conditions.city,
         conditions.monthRange[0]?.getTime(),
-        conditions.monthRange[1]?.getTime()
+        conditions.monthRange[1]?.getTime(),
     )
         .then(data => {
             for (const deal of data) {
