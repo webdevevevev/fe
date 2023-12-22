@@ -146,8 +146,20 @@ export function findAnswers(start: number, end: number): Promise<{ list: Answer[
   return instance.get('/answer', {params: {start, end}})
 }
 
-export async function getDeals() {
-  const deals: Deal[] = await instance.get('/admin/deal')
+export async function getDeals(city: number, start?: number, end?: number) {
+  if (end <= 0) {
+    end = Date.now()
+  }
+  if (start <= 0) {
+    start = end - 3 * 30 * 24 * 60 * 60 * 1000
+  }
+  const deals: Deal[] = await instance.get('/admin/deal', {
+    params: {
+      c: city,
+      start,
+      end,
+    },
+  })
   for (const deal of deals) {
     Object.setPrototypeOf(deal, Deal.prototype)
   }
