@@ -40,7 +40,7 @@ jobs:
         run: pnpm install
 
       - name: Build project
-        run: pnpm exec vite build --mode development
+        run: pnpm exec vite build
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
