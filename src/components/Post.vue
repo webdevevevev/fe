@@ -45,6 +45,7 @@ const publishDisabled = computed(() => {
 function newAnswer() {
     const answer: Record<string, any> = new Answer()
     answer.userId = store.getters.userId
+    answer.user.id = answer.userId
     answer.offerId = props.base.id
     answer.offer = new Offer()
     answer.offer.id = answer.offerId
@@ -213,14 +214,32 @@ async function onReject() {
                         autocomplete="off"
                     />
                 </el-form-item>
+                <el-form-item>
+                    <el-upload
+                        v-model:file-list="dialogAnswer.files"
+                        class="upload"
+                        :auto-upload="false"
+                        multiple
+                    >
+                        <template #trigger>
+                            <el-button type="primary">选择文件</el-button>
+                        </template>
+
+                        <template #tip>
+                            <div class="el-upload__tip">
+                                支持上传图片和视频
+                            </div>
+                        </template>
+                    </el-upload>
+                </el-form-item>
             </el-form>
             <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="dialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="submitDialog">
-              提交
-            </el-button>
-          </span>
+                <span class="dialog-footer">
+                    <el-button @click="dialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="submitDialog">
+                        提交
+                    </el-button>
+                </span>
             </template>
         </el-dialog>
     </article>
@@ -263,5 +282,9 @@ async function onReject() {
     padding: .4em;
     border-radius: var(--el-border-radius-base);
     color: #fff;
+}
+
+.upload {
+    width: 100%;
 }
 </style>

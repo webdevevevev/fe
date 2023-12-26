@@ -126,7 +126,14 @@ export async function getAnswer(id: number) {
 }
 
 export async function publishAnswer(answer: Answer) {
-  const obj: { insertId: number } = await instance.post('/answer', answer)
+  const fd = new FormData()
+  fd.append('offerId', answer.offer.id.toString())
+  fd.append('desc', answer.desc)
+  fd.append('state', answer.state.toString())
+  for (const {raw: file} of answer.files) {
+    fd.append('files', file, file.name)
+  }
+  const obj: { insertId: number } = await instance.post('/answer', fd)
   return obj.insertId
 }
 
