@@ -185,13 +185,14 @@ export async function getDeals(city: number, start?: number, end?: number) {
   if (start <= 0) {
     start = end - 3 * 30 * 24 * 60 * 60 * 1000
   }
-  const deals: Deal[] = await instance.get('/admin/deal', {
-    params: {
-      c: city,
-      start,
-      end,
-    },
-  })
+  const params: Record<string, any> = {
+    start,
+    end,
+  }
+  if (city >= 0) {
+    params.c = city
+  }
+  const deals: Deal[] = await instance.get('/admin/deal', {params})
   for (const deal of deals) {
     Object.setPrototypeOf(deal, Deal.prototype)
   }
