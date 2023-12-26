@@ -116,13 +116,13 @@ function updateChart(deals: ReadonlyArray<Deal>, order: SortOrder) {
         return []
     }
     const dealsASC = order === SortOrder.ASC ? deals : [...deals].reverse()
-    const {x, price, count} = ChartDataASC(dealsASC)
+    const {x, price, count} = chartDataASC(dealsASC)
     option.series[0].data = count.map((n, i) => [x[i], n])
     option.series[1].data = price.map((n, i) => [x[i], n])
     myChart.setOption(option)
 }
 
-function ChartDataASC(deals: ReadonlyArray<Deal>) {
+function chartDataASC(deals: ReadonlyArray<Deal>) {
     const minDate = new Date(deals[0].time)
     let year = minDate.getFullYear()
     let month = minDate.getMonth()
@@ -222,6 +222,8 @@ let myChart: echarts.ECharts
 onMounted(() => {
     myChart = echarts.init(chartDom.value, null, {locale: 'ZH'})
 })
+
+const collapseItems = ['table', 'chart']
 </script>
 
 <template>
@@ -251,7 +253,7 @@ onMounted(() => {
                 <el-button
                     type="primary"
                     class="btn"
-                    @click=""
+                    @click="load"
                 >
                     搜索
                 </el-button>
@@ -259,18 +261,30 @@ onMounted(() => {
         </el-form>
     </header>
 
-    <el-table-v2
-        v-model:sort-state="sortState"
-        :columns="columns"
-        :data="deals"
-        :width="width * 5"
-        :height="600"
-        fixed
-        @column-sort="onSort"
-        class="list"
-    />
+    <el-collapse class="body" v-model="collapseItems">
+        <el-collapse-item name="table">
+            <template #title>
+                <h3>统计表</h3>
+            </template>
+            <el-table-v2
+                v-model:sort-state="sortState"
+                :columns="columns"
+                :data="deals"
+                :width="width * 5"
+                :height="600"
+                fixed
+                @column-sort="onSort"
+                class="list"
+            />
+        </el-collapse-item>
 
-    <div ref="chartDom" class="chart"></div>
+        <el-collapse-item name="chart">
+            <template #title>
+                <h3>统计图</h3>
+            </template>
+            <div ref="chartDom" class="chart"></div>
+        </el-collapse-item>
+    </el-collapse>
 </template>
 
 <style scoped>
@@ -278,8 +292,13 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    margin: 0 16em;
     border-bottom: var(--el-border);
+}
+
+.header,
+.body {
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .toolbar {
