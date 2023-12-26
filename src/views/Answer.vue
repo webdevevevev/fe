@@ -4,7 +4,6 @@ import {reactive} from 'vue'
 import {Answer} from '../entity/Answer'
 import * as api from '../api'
 import {User} from '../entity/User'
-import {ElMessage} from 'element-plus'
 
 const props = defineProps<{
     id: number | string

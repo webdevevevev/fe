@@ -17,7 +17,7 @@ export const offerStateLabels = [
 
 export const answerStateLabels = [
   '待接受',
-  '同意',
-  '拒绝',
-  '取消',
+  '已同意',
+  '被拒绝',
+  '已取消',
 ]

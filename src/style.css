@@ -80,6 +80,7 @@ h1 {
   background-color: var(--el-color-warning);
 }
 
-.expired {
+.expired,
+.rejected {
   background-color: var(--el-color-info);
 }

@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import {deleteOffer} from '../api'
-import {offerStateLabels, typeLabels} from '../labels'
+import {answerStateLabels, offerStateLabels, typeLabels} from '../labels'
 import {Offer, State as OfferState} from '../entity/Offer'
 import OfferTypeSelect from '../components/OfferTypeSelect.vue'
 import {onMounted, reactive, ref} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import * as api from '../api'
 import axios, {AxiosError} from 'axios'
-import {useThrottleFn} from '@vueuse/core'
+import {useDateFormat, useThrottleFn} from '@vueuse/core'
 import Card from '../components/Card.vue'
+import {Answer, State as AnswerState} from '../entity/Answer'
 
 const pageSize = 12
 
 const offers = reactive<Offer[]>([])
+const answers = reactive<Answer[]>([])
 const total = ref(0)
 onMounted(loadPage)
 
@@ -49,7 +51,13 @@ let source = axios.CancelToken.source()
 
 const loadingPage = ref(false)
 
-async function loadPage(pageNo = 1) {
+function loadPage(pageNo = 1) {
+    return selectedMenu.value === Menu.answer
+        ? loadAnswers(pageNo)
+        : loadOffers(pageNo)
+}
+
+async function loadOffers(pageNo = 1) {
     const start = (pageNo - 1) * pageSize
     const end = pageNo * pageSize
     let data: {
@@ -75,6 +83,41 @@ async function loadPage(pageNo = 1) {
     }
     offers.splice(0, offers.length, ...data.list)
     total.value = data.total
+}
+
+async function loadAnswers(pageNo = 1) {
+    const start = (pageNo - 1) * pageSize
+    const end = pageNo * pageSize
+    let data: {
+        list: Answer[],
+        total: number
+    }
+
+    loadingPage.value = true
+    source.cancel()
+    source = axios.CancelToken.source()
+    try {
+        data = await api.findAnswers(start, end)
+    } catch (e) {
+        if (!axios.isCancel(e)) {
+            ElMessage.error({
+                showClose: true,
+                message: (e as AxiosError).message,
+            })
+        }
+        return console.error(e)
+    } finally {
+        loadingPage.value = false
+    }
+    answers.splice(0, answers.length, ...data.list)
+    total.value = data.total
+
+    for (const answer of answers) {
+        api.getPublicProfile(answer.user.id)
+            .then(profile => {
+                answer.user = profile
+            })
+    }
 }
 
 const throttledLoadPage = useThrottleFn(loadPage, 300, true)
@@ -243,7 +286,35 @@ function checkPending(offer: Offer, msg: string) {
     </div>
     <ul v-if="offers.length" class="list" v-loading="loadingPage">
         <li
-            class="offer-preview"
+            class="preview"
+            v-if="selectedMenu === Menu.answer"
+            v-for="(answer, i) in answers"
+            :key="answer.id"
+        >
+            <Card
+                :base="answer"
+                shadow="always"
+                v-loading="processingIdx === i"
+                @reject="deleteOffer(i)"
+            >
+                <template #footer>
+                    <span>
+                        {{ useDateFormat(answer.ctime, 'YYYY-MM-DD HH:mm').value }}
+                    </span>
+                    <el-tooltip :content="`状态：${answerStateLabels[answer.state]}`">
+                        <span
+                            class="state"
+                            :class="AnswerState[answer.state]"
+                        >
+                            {{ answerStateLabels[answer.state] }}
+                        </span>
+                    </el-tooltip>
+                </template>
+            </Card>
+        </li>
+        <li
+            class="preview"
+            v-else
             v-for="(offer, i) in offers"
             :key="offer.id"
         >
@@ -262,14 +333,14 @@ function checkPending(offer: Offer, msg: string) {
                         <el-badge
                             v-if="offer.state === OfferState.pending"
                             :value="offer.answerIds.length"
-                            class="offer-state"
+                            class="state"
                             :class="OfferState[offer.state]"
                         >
                             {{ offerStateLabels[offer.state] }}
                         </el-badge>
                         <span
                             v-else
-                            class="offer-state"
+                            class="state"
                             :class="OfferState[offer.state]"
                         >
                             {{ offerStateLabels[offer.state] }}
@@ -399,11 +470,11 @@ function checkPending(offer: Offer, msg: string) {
     margin: 20px auto 10px;
 }
 
-.offer-preview {
+.preview {
     cursor: pointer;
 }
 
-.offer-preview:hover {
+.preview:hover {
     transform: scale(1.02);
     transition: transform .2s;
 }
@@ -430,7 +501,7 @@ function checkPending(offer: Offer, msg: string) {
     margin-left: 1em;
 }
 
-.offer-state {
+.state {
     padding: .4em;
     border-radius: var(--el-border-radius-base);
     color: #fff;

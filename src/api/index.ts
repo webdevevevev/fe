@@ -158,8 +158,20 @@ export function reject(id: number) {
   return instance.post(`/reject/${id}`)
 }
 
-export function findAnswers(start: number, end: number): Promise<{ list: Answer[], total: number }> {
-  return instance.get('/answer', {params: {start, end}})
+export async function findAnswers(start: number, end: number) {
+  const {list, total}: {
+    list: Record<string, any>[],
+    total: number
+  } = await instance.get('/answer', {params: {start, end}})
+
+  for (const answer of list) {
+    Object.setPrototypeOf(answer, Answer.prototype)
+    answer.user = {id: answer.userId}
+    delete answer.userId
+    Object.setPrototypeOf(answer, Answer.prototype)
+  }
+
+  return {list: list as Answer[], total}
 }
 
 export async function getDeals(city: number, start?: number, end?: number) {
