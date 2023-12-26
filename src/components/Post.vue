@@ -196,7 +196,9 @@ async function onReject() {
             v-for="file in base.files"
             :key="file"
         >
-            {{ file }}
+            <el-image v-if="/\.(?:(?:pn|jpe?)g|webp)$/.test(file)" :src="file" :alt="file"/>
+            <video v-else-if="/\.(?:webm|mp4)$/.test(file)" :src="file" controls/>
+            <span v-else>{{ file }}</span>
         </p>
         <el-dialog
             v-model="dialogVisible"
