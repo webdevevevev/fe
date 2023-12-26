@@ -333,6 +333,24 @@ function checkPending(offer: Offer, msg: string) {
                     format="YYYY/MM/DD HH:mm:ss"
                 />
             </el-form-item>
+            <el-form-item label="文件列表">
+                <el-upload
+                    v-model:file-list="dialogOffer.files"
+                    class="upload"
+                    :auto-upload="false"
+                    multiple
+                >
+                    <template #trigger>
+                        <el-button type="primary">选择文件</el-button>
+                    </template>
+
+                    <template #tip>
+                        <div class="el-upload__tip">
+                            支持上传图片和视频
+                        </div>
+                    </template>
+                </el-upload>
+            </el-form-item>
         </el-form>
         <template #footer>
           <span class="dialog-footer">

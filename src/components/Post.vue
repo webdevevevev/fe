@@ -214,7 +214,7 @@ async function onReject() {
                         autocomplete="off"
                     />
                 </el-form-item>
-                <el-form-item>
+                <el-form-item label="文件列表">
                     <el-upload
                         v-model:file-list="dialogAnswer.files"
                         class="upload"

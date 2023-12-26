@@ -101,7 +101,16 @@ export async function findOffers(
 }
 
 export async function publishOffer(offer: Offer) {
-  const obj: { insertId: number } = await instance.post('/offer', offer)
+  const fd = new FormData()
+  fd.append('type', offer.type.toString())
+  fd.append('title', offer.title)
+  fd.append('desc', offer.desc)
+  fd.append('price', offer.price.toString())
+  fd.append('expire', offer.expire.toISOString())
+  for (const {raw: file} of offer.files) {
+    fd.append('files', file, file.name)
+  }
+  const obj: { insertId: number } = await instance.post('/offer', fd)
   return obj.insertId
 }
 
