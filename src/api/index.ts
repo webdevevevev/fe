@@ -2,9 +2,8 @@ import axios from 'axios'
 import {User} from '../entity/User'
 import {validateOrReject} from 'class-validator'
 import {Offer} from '../entity/Offer'
-import {CancelToken} from 'axios/index'
+import {CancelToken} from 'axios'
 import {Answer} from '../entity/Answer'
-import {parseSign} from '../utils'
 import {Deal} from '../entity/Deal'
 
 export * from './district'
@@ -24,7 +23,7 @@ instance.interceptors.request.use(config => {
 instance.interceptors.response.use(({data}) => data)
 
 export function allUsers() {
-  return instance.get<any, User[]>('/user')
+  return instance.get<any, User[]>('/admin/user')
 }
 
 export async function nickname(id: number) {

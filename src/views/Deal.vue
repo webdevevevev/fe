@@ -7,6 +7,7 @@ import {SortOrder} from 'element-plus/es/components/table-v2/src/constants'
 import CitySelect from '../components/CitySelect.vue'
 import * as echarts from 'echarts'
 import type {ECBasicOption} from 'echarts/types/src/util/types'
+import {User} from '../entity/User'
 
 const conditions = reactive<{
     province: number
@@ -75,7 +76,7 @@ const columns: Column[] = [{
 
 const deals = ref<Deal[]>([])
 
-function load() {
+function loadDeals() {
     api.getDeals(
         conditions.city,
         conditions.monthRange[0]?.getTime(),
@@ -92,7 +93,7 @@ function load() {
     })
 }
 
-load()
+loadDeals()
 
 const sortState = ref<SortState>({
     'time': TableV2SortOrder.DESC,
@@ -149,17 +150,6 @@ function chartDataASC(deals: ReadonlyArray<Deal>) {
         }
     }
     return {x, price, count}
-}
-
-let base = new Date(1988, 9, 3).getTime()
-const oneMonth = 30 * 24 * 3600 * 1000
-
-const data = [[base, Math.random() * 300]]
-
-for (let i = 1; i < 666; i++) {
-    base += oneMonth
-    const now = new Date(base)
-    data.push([now.getTime(), Math.round((Math.random() - 0.5) * 20 + data[i - 1][1])])
 }
 
 const chartDom = ref(null)
@@ -223,7 +213,48 @@ onMounted(() => {
     myChart = echarts.init(chartDom.value, null, {locale: 'ZH'})
 })
 
-const collapseItems = ['table', 'chart']
+const collapseItems = ['table', 'chart', 'users']
+
+const userColumns: Column[] = [{
+    key: 'id',
+    dataKey: 'id',
+    title: 'ID',
+    width,
+    align: 'center',
+}, {
+    key: 'nickname',
+    dataKey: 'nickname',
+    title: '用户名',
+    width,
+    align: 'center',
+}, {
+    key: 'isAdmin',
+    dataKey: 'isAdmin',
+    title: '用户类型',
+    width,
+    align: 'center',
+}, {
+    key: 'isVIP',
+    dataKey: 'isVIP',
+    title: '用户级别',
+    width,
+    align: 'center',
+}]
+
+const users = reactive<User[]>([])
+
+function loadUsers() {
+    api.allUsers()
+        .then(data => {
+            for (const user of data) {
+                user.isAdmin = user.isAdmin ? '管理员' : '普通用户'
+                user.isVIP = user.isVIP ? 'VIP' : '一般'
+            }
+            users.push(...data)
+        })
+}
+
+loadUsers()
 </script>
 
 <template>
@@ -253,7 +284,7 @@ const collapseItems = ['table', 'chart']
                 <el-button
                     type="primary"
                     class="btn"
-                    @click="load"
+                    @click="loadDeals"
                 >
                     搜索
                 </el-button>
@@ -283,6 +314,20 @@ const collapseItems = ['table', 'chart']
                 <h3>统计图</h3>
             </template>
             <div ref="chartDom" class="chart"></div>
+        </el-collapse-item>
+
+        <el-collapse-item name="users">
+            <template #title>
+                <h3>用户信息</h3>
+            </template>
+            <el-table-v2
+                :columns="userColumns"
+                :data="users"
+                :width="width * 5"
+                :height="600"
+                fixed
+                class="list"
+            />
         </el-collapse-item>
     </el-collapse>
 </template>
