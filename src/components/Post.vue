@@ -53,7 +53,7 @@ function newAnswer() {
 }
 
 function submitDialog() {
-    return isOwn
+    return isOwn.value
         ? updateAnswer(props.base as Answer)
         : publishAnswer()
 }
