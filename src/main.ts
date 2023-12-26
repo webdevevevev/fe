@@ -1,6 +1,6 @@
 import {createApp} from 'vue'
 import App from './App.vue'
-import ElementPlus from 'element-plus'
+import ElementPlus, {ElMessage} from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import store from './store'
@@ -12,6 +12,15 @@ const app = createApp(App)
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
+}
+
+app.config.errorHandler = err => {
+  console.error(err)
+  const message = err.code === 'ERR_NETWORK' ? '网络错误' : err?.message ?? err
+  ElMessage.error({
+    showClose: true,
+    message,
+  })
 }
 
 app

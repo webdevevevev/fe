@@ -14,16 +14,7 @@ const form = reactive({
 })
 
 async function onSubmit() {
-    let signOrMsg: { sign: string, nickname: string } | string
-    try {
-        signOrMsg = await api.signin(form.name, form.pwd)
-    } catch (e: any) {
-        ElMessage.error({
-            showClose: true,
-            message: e,
-        })
-        return console.error(e)
-    }
+    const signOrMsg: { sign: string, nickname: string } | string = await api.signin(form.name, form.pwd)
     if (typeof signOrMsg === 'object') {
         const {sign} = signOrMsg
         store.commit('signin', {nickname: form.name, sign})

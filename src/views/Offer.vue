@@ -42,13 +42,7 @@ async function init(offer: Offer, answers: Answer[]) {
     }
 }
 
-init(offer, answers).catch(e => {
-    ElMessage.error({
-        showClose: true,
-        message: e.message,
-    })
-    console.error(e)
-})
+init(offer, answers)
 
 function isShowing({state}: Answer) {
     return state === AnswerState.pending || state === AnswerState.accepted
@@ -60,30 +54,14 @@ function publishAnswer(answer: Answer) {
 
 async function onAccept(i: number) {
     const answer = answers[i]
-    try {
-        await api.accept(answer.id)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        console.error(e)
-    }
+    await api.accept(answer.id)
     answer.state = AnswerState.accepted
     offer.state = OfferState.fulfilled
 }
 
 async function onReject(i: number) {
     const answer = answers[i]
-    try {
-        await api.reject(answer.id)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        console.error(e)
-    }
+    await api.reject(answer.id)
     answer.state = AnswerState.rejected
     answers.splice(i, 1)
 }

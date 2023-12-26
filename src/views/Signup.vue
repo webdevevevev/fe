@@ -62,16 +62,7 @@ async function signup() {
     user.provinceId = province.id
     user.cityId = province.cities[userCityIdx.value].id
 
-    let userOrMsg: User | string
-    try {
-        userOrMsg = await api.signup(user, false)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        return console.error(e)
-    }
+    const userOrMsg = await api.signup(user, false)
     if (userOrMsg instanceof User) {
         store.commit('signin', userOrMsg)
         ElMessage.success({

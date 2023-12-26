@@ -60,31 +60,13 @@ function submitDialog() {
 
 function updateAnswer(answer: Answer) {
     dialogVisible.value = false
-
-    try {
-        return api.updateAnswer(answer)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        return console.error(e)
-    }
+    return api.updateAnswer(answer)
 }
 
 async function publishAnswer() {
     dialogVisible.value = false
 
-    let id: number
-    try {
-        id = await api.publishAnswer(dialogAnswer)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        return console.error(e)
-    }
+    const id = await api.publishAnswer(dialogAnswer)
     const answer: Record<string, any> = dialogAnswer
     dialogAnswer = reactive(newAnswer())
     answer.id = id
@@ -95,29 +77,13 @@ async function publishAnswer() {
 
 async function onAccept() {
     const answer = props.base as Answer
-    try {
-        await api.accept(answer.id)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        console.error(e)
-    }
+    await api.accept(answer.id)
     answer.state = AnswerState.accepted
 }
 
 async function onReject() {
     const answer = props.base
-    try {
-        await api.reject(answer.id)
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        console.error(e)
-    }
+    await api.reject(answer.id)
     answer.state = AnswerState.rejected
 }
 </script>

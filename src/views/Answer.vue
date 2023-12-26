@@ -20,13 +20,7 @@ async function init(answer: Answer) {
     Object.assign(answer, o)
 }
 
-init(answer).catch(e => {
-    ElMessage.error({
-        showClose: true,
-        message: e.message,
-    })
-    console.error(e)
-})
+init(answer)
 </script>
 
 <template>

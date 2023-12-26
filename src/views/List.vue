@@ -124,18 +124,10 @@ async function editOffer() {
 
 function onSubmit() {
     dialogVisible.value = false
-    try {
-        if (dialogType.value === DialogType.publish) {
-            publishOffer()
-        } else {
-            editOffer()
-        }
-    } catch (e) {
-        ElMessage.error({
-            showClose: true,
-            message: (e as AxiosError).message,
-        })
-        return console.error(e)
+    if (dialogType.value === DialogType.publish) {
+        publishOffer()
+    } else {
+        editOffer()
     }
 }
 
