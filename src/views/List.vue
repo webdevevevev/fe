@@ -239,6 +239,12 @@ function checkPending(offer: Offer, msg: string) {
     }
     return true
 }
+
+async function cancelAnswer(i: number) {
+    const answer = answers[i]
+    await api.cancelAnswer(answer.id)
+    answer.state = AnswerState.canceled
+}
 </script>
 
 <template>
@@ -295,7 +301,7 @@ function checkPending(offer: Offer, msg: string) {
                 :base="answer"
                 shadow="always"
                 v-loading="processingIdx === i"
-                @reject="deleteOffer(i)"
+                @cancel="cancelAnswer(i)"
             >
                 <template #footer>
                     <span>

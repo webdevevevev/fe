@@ -4,6 +4,7 @@ import {Answer, State as AnswerState} from '../entity/Answer'
 import {Offer} from '../entity/Offer'
 import {useRouter} from 'vue-router'
 import {computed} from 'vue'
+import {useStore} from 'vuex'
 
 const props = defineProps<{
     base: Offer | Answer
@@ -14,7 +15,12 @@ const emits = defineEmits<{
     (event: 'delete-offer', offer: Offer): void
     (event: 'accept', answer: Answer): void
     (event: 'reject', answer: Answer): void
+    (event: 'cancel', answer: Answer): void
 }>()
+
+const store = useStore()
+
+const isOwn = computed(() => props.base.user?.id === store.getters.userId)
 
 const router = useRouter()
 
@@ -50,19 +56,32 @@ const title = computed(() => props.base instanceof Offer
                         <el-button :icon="Edit" @click="emits('edit-offer', base)"/>
                     </el-tooltip>
                 </template>
+                <template v-else-if="isOwn">
+                    <el-tooltip content="取消">
+                        <el-button
+                            class="reject-btn"
+                            @click="emits('cancel', base)"
+                            :disabled="base.state !== AnswerState.pending"
+                        >
+                            <el-icon color="red">
+                                <CloseBold/>
+                            </el-icon>
+                        </el-button>
+                    </el-tooltip>
+                </template>
                 <template v-else>
                     <el-tooltip content="接受">
                         <el-button
                             :icon="Select"
                             @click="emits('accept', base)"
-                            :disabled="base.state === AnswerState.accepted"
+                            :disabled="base.state !== AnswerState.pending"
                         />
                     </el-tooltip>
                     <el-tooltip content="拒绝">
                         <el-button
                             class="reject-btn"
                             @click="emits('reject', base)"
-                            :disabled="base.state === AnswerState.accepted"
+                            :disabled="base.state !== AnswerState.pending"
                         >
                             <el-icon color="red">
                                 <CloseBold/>

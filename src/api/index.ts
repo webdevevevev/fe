@@ -158,6 +158,10 @@ export function reject(id: number) {
   return instance.post(`/reject/${id}`)
 }
 
+export function cancelAnswer(id: number) {
+  return instance.post(`/cancel/${id}`)
+}
+
 export async function findAnswers(start: number, end: number) {
   const {list, total}: {
     list: Record<string, any>[],
