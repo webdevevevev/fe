@@ -21,8 +21,12 @@ async function loadData() {
     Object.assign(user, profile)
     user.mtime = new Date(user.mtime)
     user.ctime = new Date(user.ctime)
+    const provinceName = await api.getCityName(user.provinceId, user.provinceId)
     const cityName = await api.getCityName(user.provinceId, user.cityId)
-    Object.assign(user, cityName)
+    Object.assign(user, {
+        province: provinceName,
+        city: cityName,
+    })
 }
 
 loadData()
