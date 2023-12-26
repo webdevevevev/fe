@@ -43,6 +43,7 @@ async function onSubmit() {
                 v-model="form.pwd"
                 type="password"
                 show-password
+                @keydown.enter="onSubmit"
             />
         </el-form-item>
         <el-form-item>
