@@ -12,7 +12,11 @@ if (store.state.sign) {
 
 <template>
     <nav class="nav">
-        <h1 class="title">好去处</h1>
+        <h1 class="title">
+            <router-link to="/">
+                好去处
+            </router-link>
+        </h1>
         <el-dropdown
             class="dropdown"
             trigger="click"
@@ -60,6 +64,11 @@ if (store.state.sign) {
     display: flex;
     justify-content: space-between;
     padding-bottom: 1em;
+}
+
+.title a {
+    color: unset;
+    font-weight: unset;
 }
 
 .dropdown {
