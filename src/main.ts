@@ -16,7 +16,9 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 app.config.errorHandler = err => {
   console.error(err)
-  const message = err.code === 'ERR_NETWORK' ? '网络错误' : err?.message ?? err
+  const message = ['ERR_NETWORK', 'ECONNABORTED'].includes(err.code)
+    ? '网络错误'
+    : err?.message ?? err
   ElMessage.error({
     showClose: true,
     message,
