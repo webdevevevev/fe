@@ -42,8 +42,8 @@ async function onSubmit() {
 </script>
 
 <template>
-    <h2>登录</h2>
-    <el-form :model="form" label-width="80px">
+    <el-form class="form" :model="form" label-width="80px">
+        <h2 class="header">登录</h2>
         <el-form-item label="用户名">
             <el-input v-model="form.name"/>
         </el-form-item>
@@ -64,6 +64,15 @@ async function onSubmit() {
 </template>
 
 <style scoped>
+.form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header {
+    margin: 2em 0;
+}
+
 .link {
     color: #666;
     text-decoration: underline;

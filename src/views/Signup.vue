@@ -89,8 +89,8 @@ async function signup() {
 </script>
 
 <template>
-    <h2>注册</h2>
-    <el-form :model="user" label-width="80px">
+    <el-form class="form" :model="user" label-width="80px">
+        <h2 class="header">注册</h2>
         <el-form-item label="用户名">
             <el-input v-model="user.nickname"/>
         </el-form-item>
@@ -144,6 +144,15 @@ async function signup() {
 </template>
 
 <style scoped>
+.form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header {
+    margin: 2em 0;
+}
+
 .link {
     color: #666;
     text-decoration: underline;
