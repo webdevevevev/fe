@@ -75,6 +75,10 @@ if (store.state.sign) {
     background: url("../public/logoc.png") center / cover no-repeat;
 }
 
+.title span {
+    opacity: 0;
+}
+
 .dropdown {
     cursor: pointer;
 }
