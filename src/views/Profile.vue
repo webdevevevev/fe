@@ -3,6 +3,7 @@ import {User} from '../entity/User'
 import type {User as UserEntity} from '../entity/User'
 import {reactive} from 'vue'
 import * as api from '../api'
+import {updateProfile} from '../api'
 
 const IDCardTypeLabels = [
     '中华人民共和国居民身份证',
@@ -27,6 +28,8 @@ async function loadData() {
         province: provinceName,
         city: cityName,
     })
+    toModify.phone = user.phone
+    toModify.intro = user.intro
 }
 
 loadData()
@@ -43,6 +46,26 @@ function fmtDate(date: Date) {
     const mi = date.getMinutes()
     return `${y}年${m}月${d}日 ${fmtNum(h)}:${fmtNum(mi)}`
 }
+
+const toModify = reactive({
+    pwd: '',
+    phone: user.phone,
+    intro: user.intro,
+})
+
+function onSave() {
+    const payload: Partial<typeof toModify> = {}
+    if (toModify.pwd) {
+        payload.pwd = toModify.pwd
+    }
+    if (toModify.phone !== user.phone) {
+        payload.phone = toModify.phone
+    }
+    if (toModify.intro !== user.intro) {
+        payload.intro = toModify.intro
+    }
+    api.updateProfile(payload)
+}
 </script>
 
 <template>
@@ -50,24 +73,29 @@ function fmtDate(date: Date) {
         <el-form-item label="ID">{{ user.id }}</el-form-item>
         <el-form-item label="用户名">{{ user.nickname }}</el-form-item>
         <el-form-item label="密码">
-            <el-input type="password" v-model="user.pwd"/>
+            <el-input type="password" v-model="toModify.pwd"/>
         </el-form-item>
         <el-form-item label="用户类型">{{ user.isAdmin ? '系统管理员' : '普通用户' }}</el-form-item>
         <el-form-item label="姓名">{{ user.name }}</el-form-item>
         <el-form-item label="证件类型">{{ IDCardTypeLabels[user.IDCardType] }}</el-form-item>
         <el-form-item label="证件号码">{{ user.IDCardNo }}</el-form-item>
         <el-form-item label="手机号码">
-            <el-input v-model="user.phone"/>
+            <el-input v-model="toModify.phone"/>
         </el-form-item>
         <el-form-item label="用户级别">{{ user.isVIP ? 'VIP' : '一般' }}</el-form-item>
         <el-form-item label="用户简介">
-            <el-input v-model="user.intro" type="textarea"/>
+            <el-input v-model="toModify.intro" type="textarea"/>
         </el-form-item>
         <el-form-item label="注册城市">{{ user.province }} {{ user.city }}</el-form-item>
         <el-form-item label="注册时间" v-if="user.ctime">{{ fmtDate(user.ctime) }}</el-form-item>
         <el-form-item label="修改时间" v-if="user.mtime">{{ fmtDate(user.mtime) }}</el-form-item>
         <el-form-item>
-            <el-button type="primary">保存</el-button>
+            <el-button
+                type="primary"
+                @click="onSave"
+            >
+                保存
+            </el-button>
         </el-form-item>
     </el-form>
 </template>

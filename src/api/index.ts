@@ -35,6 +35,10 @@ export function profile() {
   return instance.get<any, string>('/user')
 }
 
+export function updateProfile(payload: Partial<User>) {
+  return instance.put('/user', payload)
+}
+
 export function getPublicProfile(id: number) {
   return instance.get<any, User>(`/user/${id}`)
 }
