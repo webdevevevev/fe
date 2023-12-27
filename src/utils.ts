@@ -12,5 +12,8 @@ export function parseSign(sign: string): {
 } {
   const start = sign.indexOf('.') + 1
   const base64 = sign.substring(start, sign.indexOf('.', start))
-  return JSON.parse(atob(base64))
+  const obj = JSON.parse(atob(base64))
+  obj.admin = obj.isAdmin
+  delete obj.isAdmin
+  return obj
 }
