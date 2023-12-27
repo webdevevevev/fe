@@ -2,6 +2,10 @@ export function isSignedIn() {
   return Boolean(localStorage.getItem('sign'))
 }
 
+export function isAdmin() {
+  return parseSign(localStorage.getItem('sign')).admin
+}
+
 export function parseSign(sign: string): {
   id: number
   admin: boolean

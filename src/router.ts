@@ -1,7 +1,8 @@
 import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
 import Home from './views/Home.vue'
 import List from './views/List.vue'
-import {isSignedIn} from './utils'
+import {isAdmin, isSignedIn} from './utils'
+import {ElMessage} from 'element-plus'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -68,9 +69,25 @@ const router = createRouter({
   routes,
 })
 
+function handelRouteError(msg: string) {
+  ElMessage.error({
+    message: msg,
+    showClose: true,
+  })
+  console.error(msg)
+}
+
 router.beforeEach(to => {
-  if (to.meta.requiresAuth && !isSignedIn()) {
-    return 'welcome'
+  if (to.meta.requiresAuth) {
+    if (isSignedIn()) {
+      if (to.path.startsWith('/admin') && !isAdmin()) {
+        handelRouteError('无权访问')
+        return 'welcome'
+      }
+    } else {
+      handelRouteError('需登录')
+      return 'welcome'
+    }
   }
 })
 
