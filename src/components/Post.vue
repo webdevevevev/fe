@@ -46,6 +46,7 @@ function newAnswer() {
     const answer: Record<string, any> = new Answer()
     answer.userId = store.getters.userId
     answer.user.id = answer.userId
+    answer.user.nickname = store.state.nickname
     answer.offerId = props.base.id
     answer.offer = new Offer()
     answer.offer.id = answer.offerId
@@ -70,8 +71,6 @@ async function publishAnswer() {
     const answer: Record<string, any> = dialogAnswer
     dialogAnswer = reactive(newAnswer())
     answer.id = id
-    answer.user = new User()
-    answer.user.nickname = store.state.nickname
     emits('publish', answer as Answer)
 }
 
