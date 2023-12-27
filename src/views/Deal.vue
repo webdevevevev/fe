@@ -83,7 +83,9 @@ function loadDeals() {
         conditions.monthRange[1]?.getTime(),
     ).then(data => {
         for (const deal of data) {
-            const price = Number(deal.offerPrice) + Number(deal.answerPrice)
+            deal.offerPrice = Number(deal.offerPrice)
+            deal.answerPrice = Number(deal.answerPrice)
+            const price = deal.offerPrice + deal.answerPrice
             deal.price = price.toFixed(2).toString()
         }
         deals.value = data
@@ -129,7 +131,7 @@ function chartDataASC(deals: ReadonlyArray<Deal>) {
     let year = minDate.getFullYear()
     let month = minDate.getMonth()
     const x = [new Date(year, month).getTime()]
-    const price: number[] = [deals[0].price]
+    const price: number[] = [deals[0].answerPrice + deals[0].offerPrice]
     const count = [1]
     for (let i = 1; i < deals.length; i++) {
         const deal = deals[i]
@@ -137,10 +139,10 @@ function chartDataASC(deals: ReadonlyArray<Deal>) {
         const timeMonth = time.getMonth()
         const timeYear = time.getFullYear()
         if (timeYear === year && timeMonth === month) {
-            price[price.length - 1] += deal.price
+            price[price.length - 1] += deal.answerPrice + deal.offerPrice
             count[count.length - 1]++
         } else {
-            price.push(deal.price)
+            price.push(deal.answerPrice + deal.offerPrice)
             count.push(1)
             const [nextYear, nextMonth] = timeMonth >= 12
                 ? [timeYear + 1, 0]
