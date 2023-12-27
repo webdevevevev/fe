@@ -28,7 +28,7 @@ const State = props.base instanceof Offer
     ? OfferState
     : AnswerState
 
-const btnDisabled = computed(() => props.base.state === AnswerState.accepted)
+const btnDisabled = computed(() => props.base.state !== AnswerState.pending)
 
 const isOwn = computed(() => props.base.user?.id === store.getters.userId)
 
@@ -125,6 +125,7 @@ const assetPrefix = '/uploads'
                 type="primary"
                 class="action-btn"
                 @click="dialogVisible = true"
+                :disabled="btnDisabled"
             >
                 修改响应
             </el-button>
@@ -184,7 +185,7 @@ const assetPrefix = '/uploads'
                         autocomplete="off"
                     />
                 </el-form-item>
-                <el-form-item label="文件列表">
+                <el-form-item label="文件列表" v-if="!isOwn">
                     <el-upload
                         v-model:file-list="dialogAnswer.files"
                         class="upload"

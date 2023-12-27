@@ -128,7 +128,8 @@ export function getOffer(id: number) {
 
 export async function getAnswer(id: number) {
   const obj: any = await instance.get(`/answer/${id}`)
-  obj.user = {id: obj.userId}
+  obj.user = new User()
+  obj.user.id = obj.userId
   delete obj.userId
   Object.setPrototypeOf(obj, Answer.prototype)
   return obj
@@ -147,7 +148,9 @@ export async function publishAnswer(answer: Answer) {
 }
 
 export function updateAnswer(answer: Answer) {
-  return instance.put(`/answer/${answer.id}`, answer)
+  const obj: Record<string, any> = {...answer}
+  delete obj.files
+  return instance.put(`/answer/${answer.id}`, obj)
 }
 
 export function accept(id: number) {

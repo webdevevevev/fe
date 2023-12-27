@@ -8,7 +8,7 @@ export default defineConfig(({command, mode}) => ({
   server: {
     proxy: {
       '^/(?:sign|user|offer|province)': {
-        target: 'https://mock.apifox.com/m1/3672598-0-default',
+        target: 'http://local.eirene.top:5000',
         changeOrigin: true,
         secure: false,
         bypass(req) {
@@ -16,6 +16,10 @@ export default defineConfig(({command, mode}) => ({
             return '/'
           }
         },
+      },
+      '/uploads': {
+        target: 'http://local.eirene.top:5000',
+        changeOrigin: true,
       },
     },
   },

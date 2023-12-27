@@ -12,11 +12,8 @@ const answer = reactive(new Answer())
 ;(answer as any).id = Number(props.id)
 
 async function init(answer: Answer) {
-    const o: Record<string, any> = await api.getOffer(answer.id)
-    o.user = new User()
-    o.user.id = o.userId
-    delete o.userId
-    Object.assign(answer, o)
+    const ans: Answer = await api.getAnswer(answer.id)
+    Object.assign(answer, ans)
 }
 
 init(answer)

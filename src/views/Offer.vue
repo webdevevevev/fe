@@ -33,7 +33,7 @@ async function init(offer: Offer, answers: Answer[]) {
     delete o.userId
     Object.assign(offer, o)
     const as = await Promise.all(offer.answerIds.map(id => api.getAnswer(id)))
-    answers.push(...as.filter(isShowing))
+    answers.push(...as)
     for (const answer of answers) {
         api.getPublicProfile(answer.user.id)
             .then(profile => {
@@ -65,6 +65,12 @@ async function onReject(i: number) {
     answer.state = AnswerState.rejected
     answers.splice(i, 1)
 }
+
+async function cancelAnswer(i: number) {
+    const answer = answers[i]
+    await api.cancelAnswer(answer.id)
+    answer.state = AnswerState.canceled
+}
 </script>
 
 <template>
@@ -86,6 +92,7 @@ async function onReject(i: number) {
                         :base="answer"
                         @accept="onAccept(i)"
                         @reject="onReject(i)"
+                        @cancel="cancelAnswer(i)"
                         shadow="hover"
                     >
                         <template #footer>
