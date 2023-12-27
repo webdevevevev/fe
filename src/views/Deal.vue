@@ -83,7 +83,8 @@ function loadDeals() {
         conditions.monthRange[1]?.getTime(),
     ).then(data => {
         for (const deal of data) {
-            deal.price = deal.offerPrice + deal.answerPrice
+            const price = Number(deal.offerPrice) + Number(deal.answerPrice)
+            deal.price = price.toFixed(2).toString()
         }
         deals.value = data
         onSort({
