@@ -14,7 +14,7 @@ if (store.state.sign) {
     <nav class="nav">
         <h1 class="title">
             <router-link to="/">
-                好去处
+                <span>好去处</span>
             </router-link>
         </h1>
         <el-dropdown
@@ -63,12 +63,16 @@ if (store.state.sign) {
 .nav {
     display: flex;
     justify-content: space-between;
-    padding-bottom: 1em;
+    align-items: center;
+    padding-top: 1em;
 }
 
 .title a {
+    display: inline-block;
+    height: 2em;
     color: unset;
     font-weight: unset;
+    background: url("../public/logoc.png") center / cover no-repeat;
 }
 
 .dropdown {
