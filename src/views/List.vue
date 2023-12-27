@@ -290,7 +290,11 @@ async function cancelAnswer(i: number) {
             </li>
         </ul>
     </div>
-    <ul v-if="offers.length" class="list" v-loading="loadingPage">
+    <ul
+        v-if="selectedMenu === Menu.answer && answers.length || selectedMenu !== Menu.answer && offers.length"
+        class="list"
+        v-loading="loadingPage"
+    >
         <li
             class="preview"
             v-if="selectedMenu === Menu.answer"
