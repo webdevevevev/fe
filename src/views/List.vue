@@ -402,7 +402,7 @@ async function cancelAnswer(i: number) {
                     format="YYYY/MM/DD HH:mm:ss"
                 />
             </el-form-item>
-            <el-form-item label="文件列表">
+            <el-form-item label="文件列表" v-if="dialogType === DialogType.publish">
                 <el-upload
                     v-model:file-list="dialogOffer.files"
                     class="upload"

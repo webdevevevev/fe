@@ -63,19 +63,12 @@ async function signup() {
     user.cityId = province.cities[userCityIdx.value].id
 
     const userOrMsg = await api.signup(user, false)
-    if (userOrMsg instanceof User) {
-        store.commit('signin', userOrMsg)
-        ElMessage.success({
-            showClose: true,
-            message: '注册成功',
-        })
-        router.push({name: 'signin'})
-    } else {
-        ElMessage.error({
-            showClose: true,
-            message: userOrMsg,
-        })
-    }
+    store.commit('signin', userOrMsg)
+    ElMessage.success({
+        showClose: true,
+        message: '注册成功',
+    })
+    router.push({name: 'signin'})
 }
 </script>
 

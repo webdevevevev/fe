@@ -119,7 +119,9 @@ export async function publishOffer(offer: Offer) {
 }
 
 export async function updateOffer(offer: Offer) {
-  return instance.put(`/offer/${offer.id}`, offer)
+  const obj: Record<string, any> = {...offer}
+  delete obj.files
+  return instance.put(`/offer/${offer.id}`, obj)
 }
 
 export function deleteOffer(id: number) {
