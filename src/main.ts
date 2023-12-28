@@ -15,6 +15,9 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 app.config.errorHandler = err => {
+  if (err instanceof TypeError) {
+    return
+  }
   console.error(err)
   const message = ['ERR_NETWORK', 'ECONNABORTED'].includes(err.code)
     ? '网络错误'

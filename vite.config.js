@@ -8,7 +8,7 @@ export default defineConfig(({command, mode}) => ({
   server: {
     proxy: {
       '^/(?:sign|user|offer|province)': {
-        target: 'http://local.eirene.top:5000',
+        target: 'http://local.eirene.top',
         changeOrigin: true,
         secure: false,
         bypass(req) {
@@ -18,7 +18,7 @@ export default defineConfig(({command, mode}) => ({
         },
       },
       '/uploads': {
-        target: 'http://local.eirene.top:5000',
+        target: 'http://local.eirene.top',
         changeOrigin: true,
       },
     },
