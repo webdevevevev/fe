@@ -11,7 +11,7 @@ import {useDateFormat, useThrottleFn} from '@vueuse/core'
 import Card from '../components/Card.vue'
 import {Answer, State as AnswerState} from '../entity/Answer'
 
-const pageSize = 12
+const pageSize = 8
 
 const offers = reactive<Offer[]>([])
 const answers = reactive<Answer[]>([])
